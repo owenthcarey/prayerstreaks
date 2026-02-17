@@ -1,0 +1,59 @@
+<ScrollView>
+  <StackLayout class="p-4">
+    <!-- Prayer Types Section -->
+    <Label
+      text="Prayer Types"
+      class="text-xl font-bold mb-4 mt-2"
+    ></Label>
+    <StackLayout class="rounded-xl bg-gray-100 p-4 mb-6">
+      @for (type of checkinService.prayerTypes(); track type) {
+        <GridLayout columns="*, auto" class="p-2">
+          <Label
+            col="0"
+            [text]="prayerTypeLabel(type)"
+            class="text-base"
+          ></Label>
+          <Label
+            col="1"
+            text="✕"
+            class="text-base text-red-500 p-2"
+            (tap)="checkinService.removePrayerType(type)"
+          ></Label>
+        </GridLayout>
+      }
+      <Button
+        text="+ Add custom..."
+        (tap)="addCustomType()"
+        class="text-blue-600 text-base mt-2 bg-transparent"
+      ></Button>
+    </StackLayout>
+
+    <!-- App Info Section -->
+    <Label
+      text="App Info"
+      class="text-xl font-bold mb-4"
+    ></Label>
+    <StackLayout class="rounded-xl bg-gray-100 p-4 mb-6">
+      <GridLayout columns="*, auto" class="p-2">
+        <Label col="0" text="Version" class="text-base"></Label>
+        <Label col="1" text="1.0.0" class="text-base text-gray-500"></Label>
+      </GridLayout>
+      <GridLayout columns="*, auto" class="p-2">
+        <Label col="0" text="App" class="text-base"></Label>
+        <Label
+          col="1"
+          text="Prayer Streaks"
+          class="text-base text-gray-500"
+        ></Label>
+      </GridLayout>
+    </StackLayout>
+
+    <!-- Reset Section -->
+    <Button
+      text="Reset All Data"
+      (tap)="resetAllData()"
+      class="bg-red-500 text-white text-base p-4 rounded-xl font-bold mt-4"
+    ></Button>
+  </StackLayout>
+</ScrollView>
+

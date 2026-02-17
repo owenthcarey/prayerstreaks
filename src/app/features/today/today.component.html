@@ -1,0 +1,64 @@
+<ScrollView>
+  <StackLayout class="p-4">
+    <!-- Streak display -->
+    <StackLayout class="text-center p-8">
+      <Label
+        text="🔥"
+        class="text-center"
+        style="font-size: 64"
+      ></Label>
+      <Label
+        [text]="checkinService.currentStreak()"
+        class="text-center font-bold text-orange-500"
+        style="font-size: 56"
+      ></Label>
+      <Label
+        [text]="streakText()"
+        class="text-center text-xl text-gray-500 mt-2"
+      ></Label>
+    </StackLayout>
+
+    @if (!checkinService.checkedInToday()) {
+      <!-- Prayer type selector -->
+      <Label
+        text="Prayer type (optional):"
+        class="text-lg text-gray-600 ml-2 mb-2 mt-4"
+      ></Label>
+      <WrapLayout class="ml-2 mb-6">
+        @for (type of checkinService.prayerTypes(); track type) {
+          <Label
+            [text]="prayerTypeLabel(type)"
+            [class]="
+              'm-1 p-2 px-4 rounded-full text-base ' +
+              (selectedType() === type
+                ? 'bg-blue-600 text-white'
+                : 'bg-gray-200 text-gray-700')
+            "
+            (tap)="selectType(type)"
+          ></Label>
+        }
+      </WrapLayout>
+
+      <!-- Check-in button -->
+      <Button
+        text="I Prayed Today"
+        (tap)="onCheckIn()"
+        class="bg-blue-600 text-white text-xl p-4 m-4 rounded-xl font-bold"
+      ></Button>
+    } @else {
+      <!-- Confirmation -->
+      <StackLayout class="text-center p-8">
+        <Label
+          text="✅"
+          class="text-center"
+          style="font-size: 64"
+        ></Label>
+        <Label
+          text="Checked in today!"
+          class="text-center text-2xl font-bold text-green-600 mt-4"
+        ></Label>
+      </StackLayout>
+    }
+  </StackLayout>
+</ScrollView>
+

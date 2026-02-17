@@ -1,0 +1,70 @@
+<GridLayout rows="auto, auto, *">
+  <!-- Stats bar -->
+  <GridLayout row="0" columns="*, *" class="p-4 m-4 rounded-xl bg-gray-100">
+    <StackLayout col="0" class="text-center p-2">
+      <Label
+        [text]="checkinService.currentStreak()"
+        class="text-center text-3xl font-bold text-orange-500"
+      ></Label>
+      <Label
+        text="Current"
+        class="text-center text-sm text-gray-500"
+      ></Label>
+    </StackLayout>
+    <StackLayout col="1" class="text-center p-2">
+      <Label
+        [text]="checkinService.longestStreak()"
+        class="text-center text-3xl font-bold text-blue-500"
+      ></Label>
+      <Label
+        text="Longest"
+        class="text-center text-sm text-gray-500"
+      ></Label>
+    </StackLayout>
+  </GridLayout>
+
+  <Label
+    row="1"
+    text="Last 30 Days"
+    class="text-lg font-bold ml-4 mb-2"
+  ></Label>
+
+  <!-- History list -->
+  <ListView row="2" [items]="historyItems()" separatorColor="transparent">
+    <ng-template let-item="item">
+      <StackLayout>
+        <Label
+          *ngIf="item.isMonthHeader"
+          [text]="item.monthYear"
+          class="text-base font-bold text-gray-400 p-2 px-4 mt-2"
+        ></Label>
+        <GridLayout
+          *ngIf="!item.isMonthHeader"
+          columns="auto, auto, *, auto"
+          class="p-3 px-4"
+        >
+          <Label
+            col="0"
+            [text]="item.checked ? '✅' : '❌'"
+            class="text-base"
+            width="30"
+          ></Label>
+          <Label
+            col="1"
+            [text]="item.displayDate"
+            class="text-base ml-2"
+            [class.text-gray-800]="item.checked"
+            [class.text-gray-400]="!item.checked"
+          ></Label>
+          <Label col="2" text=""></Label>
+          <Label
+            col="3"
+            [text]="item.prayerType || ''"
+            class="text-sm text-gray-500 italic"
+          ></Label>
+        </GridLayout>
+      </StackLayout>
+    </ng-template>
+  </ListView>
+</GridLayout>
+
