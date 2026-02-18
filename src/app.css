@@ -10,13 +10,22 @@
 /* Tab bar styling */
 TabView {
   tab-text-color: #8e8e93;
-  tab-background-color: transparent;
-  selected-tab-text-color: #007aff;
+  selected-tab-text-color: #2563eb;
+  tab-background-color: #f8fafc;
+}
+
+.ns-ios TabView {
+  border-top-width: 1;
+  border-top-color: #e5e7eb;
+}
+
+.ns-android TabView {
+  android-selected-tab-highlight-color: #2563eb;
 }
 
 /* App background */
 .app-background {
-  background-color: #ffffff;
+  background-color: #f9fafb;
 }
 
 .ns-dark .app-background {

@@ -1,20 +1,24 @@
 <ScrollView>
-  <StackLayout class="p-4">
+  <StackLayout class="px-5 pt-5 pb-8">
     <!-- Streak display -->
-    <StackLayout class="text-center p-8">
+    <StackLayout class="text-center p-6 rounded-2xl bg-white mb-6">
       <Label
         text="🔥"
         class="text-center"
-        style="font-size: 64"
+        style="font-size: 58"
       ></Label>
       <Label
         [text]="checkinService.currentStreak()"
         class="text-center font-bold text-orange-500"
-        style="font-size: 56"
+        style="font-size: 52"
       ></Label>
       <Label
         [text]="streakText()"
         class="text-center text-xl text-gray-500 mt-2"
+      ></Label>
+      <Label
+        text="One prayerful day at a time."
+        class="text-center text-sm text-gray-400 mt-2"
       ></Label>
     </StackLayout>
 
@@ -22,17 +26,17 @@
       <!-- Prayer type selector -->
       <Label
         text="Prayer type (optional):"
-        class="text-lg text-gray-600 ml-2 mb-2 mt-4"
+        class="text-base text-gray-500 ml-1 mb-2"
       ></Label>
-      <WrapLayout class="ml-2 mb-6">
+      <WrapLayout class="mb-6">
         @for (type of checkinService.prayerTypes(); track type) {
           <Label
             [text]="prayerTypeLabel(type)"
             [class]="
-              'm-1 p-2 px-4 rounded-full text-base ' +
+              'mr-2 mb-2 py-2 px-4 rounded-full text-base font-medium border ' +
               (selectedType() === type
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700')
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-white text-gray-700 border-gray-200')
             "
             (tap)="selectType(type)"
           ></Label>
@@ -43,19 +47,23 @@
       <Button
         text="I Prayed Today"
         (tap)="onCheckIn()"
-        class="bg-blue-600 text-white text-xl p-4 m-4 rounded-xl font-bold"
+        class="bg-blue-600 text-white text-xl p-4 rounded-2xl font-bold"
       ></Button>
     } @else {
       <!-- Confirmation -->
-      <StackLayout class="text-center p-8">
+      <StackLayout class="text-center p-8 rounded-2xl bg-white">
         <Label
           text="✅"
           class="text-center"
-          style="font-size: 64"
+          style="font-size: 58"
         ></Label>
         <Label
           text="Checked in today!"
-          class="text-center text-2xl font-bold text-green-600 mt-4"
+          class="text-center text-2xl font-bold text-green-600 mt-3"
+        ></Label>
+        <Label
+          text="Come back tomorrow to keep your streak alive."
+          class="text-center text-sm text-gray-500 mt-2"
         ></Label>
       </StackLayout>
     }

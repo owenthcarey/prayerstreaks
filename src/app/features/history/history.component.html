@@ -1,6 +1,6 @@
 <GridLayout rows="auto, auto, *">
   <!-- Stats bar -->
-  <GridLayout row="0" columns="*, *" class="p-4 m-4 rounded-xl bg-gray-100">
+  <GridLayout row="0" columns="*, *" class="p-4 mx-4 mt-5 mb-3 rounded-2xl bg-white">
     <StackLayout col="0" class="text-center p-2">
       <Label
         [text]="checkinService.currentStreak()"
@@ -23,44 +23,48 @@
     </StackLayout>
   </GridLayout>
 
-  <Label
-    row="1"
-    text="Last 30 Days"
-    class="text-lg font-bold ml-4 mb-2"
-  ></Label>
+  <Label row="1" text="Last 30 Days" class="text-2xl font-bold ml-4 mb-2"></Label>
 
   <!-- History list -->
-  <ListView row="2" [items]="historyItems()" separatorColor="transparent">
+  <ListView
+    row="2"
+    [items]="historyItems()"
+    separatorColor="transparent"
+    class="mx-4 rounded-2xl bg-white"
+  >
     <ng-template let-item="item">
       <StackLayout>
         <Label
           *ngIf="item.isMonthHeader"
           [text]="item.monthYear"
-          class="text-base font-bold text-gray-400 p-2 px-4 mt-2"
+          class="text-sm font-bold text-gray-400 p-2 px-4 mt-2 uppercase"
         ></Label>
         <GridLayout
           *ngIf="!item.isMonthHeader"
           columns="auto, auto, *, auto"
-          class="p-3 px-4"
+          class="py-3 px-4 border-b border-gray-100"
         >
           <Label
             col="0"
-            [text]="item.checked ? '✅' : '❌'"
-            class="text-base"
-            width="30"
+            [text]="item.checked ? '✓' : '✕'"
+            class="text-lg font-bold"
+            [class.text-green-500]="item.checked"
+            [class.text-red-500]="!item.checked"
+            width="24"
           ></Label>
           <Label
             col="1"
             [text]="item.displayDate"
-            class="text-base ml-2"
+            class="text-base ml-3"
             [class.text-gray-800]="item.checked"
             [class.text-gray-400]="!item.checked"
           ></Label>
           <Label col="2" text=""></Label>
           <Label
+            *ngIf="item.prayerType"
             col="3"
-            [text]="item.prayerType || ''"
-            class="text-sm text-gray-500 italic"
+            [text]="item.prayerType"
+            class="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-1"
           ></Label>
         </GridLayout>
       </StackLayout>
