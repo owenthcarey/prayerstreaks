@@ -1,6 +1,6 @@
 <GridLayout rows="auto, auto, *">
   <!-- Stats bar -->
-  <GridLayout row="0" columns="*, *" class="p-4 mx-4 mt-5 mb-3 rounded-2xl bg-white">
+  <GridLayout row="0" columns="*, *" class="p-4 mx-4 mt-5 mb-3 rounded-2xl bg-white dark:bg-[#2c2c2e]">
     <StackLayout col="0" class="text-center p-2">
       <Label
         [text]="checkinService.currentStreak()"
@@ -8,7 +8,7 @@
       ></Label>
       <Label
         text="Current"
-        class="text-center text-sm text-gray-500"
+        class="text-center text-sm text-gray-500 dark:text-gray-400"
       ></Label>
     </StackLayout>
     <StackLayout col="1" class="text-center p-2">
@@ -18,31 +18,31 @@
       ></Label>
       <Label
         text="Longest"
-        class="text-center text-sm text-gray-500"
+        class="text-center text-sm text-gray-500 dark:text-gray-400"
       ></Label>
     </StackLayout>
   </GridLayout>
 
-  <Label row="1" text="Last 30 Days" class="text-2xl font-bold ml-4 mb-2"></Label>
+  <Label row="1" text="Last 30 Days" class="text-2xl font-bold ml-4 mb-2 dark:text-white"></Label>
 
   <!-- History list -->
   <ListView
     row="2"
     [items]="historyItems()"
     separatorColor="transparent"
-    class="mx-4 rounded-2xl bg-white"
+    class="mx-4 rounded-2xl bg-white dark:bg-[#2c2c2e]"
   >
     <ng-template let-item="item">
       <StackLayout>
         <Label
           *ngIf="item.isMonthHeader"
           [text]="item.monthYear"
-          class="text-sm font-bold text-gray-400 p-2 px-4 mt-2 uppercase"
+          class="text-sm font-bold text-gray-400 dark:text-gray-500 p-2 px-4 mt-2 uppercase"
         ></Label>
         <GridLayout
           *ngIf="!item.isMonthHeader"
           columns="auto, auto, *, auto"
-          class="py-3 px-4 border-b border-gray-100"
+          class="py-3 px-4 border-b border-gray-100 dark:border-gray-700"
         >
           <Label
             col="0"
@@ -55,7 +55,7 @@
           <Label
             col="1"
             [text]="item.displayDate"
-            class="text-base ml-3"
+            class="text-base ml-3 dark:text-gray-200"
             [class.text-gray-800]="item.checked"
             [class.text-gray-400]="!item.checked"
           ></Label>
@@ -64,11 +64,10 @@
             *ngIf="item.prayerType"
             col="3"
             [text]="item.prayerType"
-            class="text-xs text-gray-500 bg-gray-100 rounded-full px-2 py-1"
+            class="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 rounded-full px-2 py-1"
           ></Label>
         </GridLayout>
       </StackLayout>
     </ng-template>
   </ListView>
 </GridLayout>
-
