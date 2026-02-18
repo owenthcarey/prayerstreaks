@@ -5,7 +5,7 @@ import {
   inject,
 } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
-import { Dialogs } from '@nativescript/core';
+import { Dialogs, isIOS } from '@nativescript/core';
 import { CheckInService } from '../../core/services/checkin.service';
 import { PrayerType, prayerTypeLabel } from '../../core/models/checkin.model';
 
@@ -19,6 +19,12 @@ import { PrayerType, prayerTypeLabel } from '../../core/models/checkin.model';
 export class SettingsComponent {
   checkinService = inject(CheckInService);
   prayerTypeLabel = prayerTypeLabel;
+
+  isIOS = isIOS;
+
+  // Material Icons glyphs (Android)
+  cancelIcon = String.fromCharCode(0xe5c9);  // cancel (filled circle with x)
+  addIcon = String.fromCharCode(0xe145);     // add
 
   async addCustomType(): Promise<void> {
     const result = await Dialogs.prompt({

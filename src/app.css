@@ -29,6 +29,11 @@ TabView {
   border-top-color: #38383a;
 }
 
+/* Material Icons font class */
+.material-icon {
+  font-family: MaterialIcons-Regular;
+}
+
 /* App background */
 .app-background {
   background-color: #f9fafb;

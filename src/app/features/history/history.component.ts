@@ -6,6 +6,7 @@ import {
   inject,
 } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
+import { isIOS } from '@nativescript/core';
 import { CheckInService } from '../../core/services/checkin.service';
 import { CheckIn, prayerTypeLabel } from '../../core/models/checkin.model';
 import {
@@ -33,6 +34,12 @@ export interface HistoryItem {
 })
 export class HistoryComponent {
   checkinService = inject(CheckInService);
+
+  isIOS = isIOS;
+
+  // Material Icons glyphs (Android)
+  checkIcon = String.fromCharCode(0xe86c);   // check_circle
+  closeIcon = String.fromCharCode(0xe5cd);   // close
 
   historyItems = computed(() => {
     const checkIns = this.checkinService.checkIns();
