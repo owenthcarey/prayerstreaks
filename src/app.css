@@ -2,31 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Tab bar styling — light mode */
+/* Tab bar styling — shared */
 TabView {
   tab-text-color: #8e8e93;
   selected-tab-text-color: #2563eb;
-  tab-background-color: #f8fafc;
 }
 
-.ns-ios TabView {
-  border-top-width: 1;
-  border-top-color: #e5e7eb;
-}
+/* iOS: no tab-background-color, no border overrides — let UITabBarController
+   provide its native translucent blur, separator, and dark-mode adaptation. */
 
+/* Android */
 .ns-android TabView {
+  tab-background-color: #f8fafc;
   android-selected-tab-highlight-color: #2563eb;
 }
 
-/* Tab bar styling — dark mode */
-.ns-dark TabView {
-  tab-text-color: #8e8e93;
-  selected-tab-text-color: #2563eb;
+.ns-dark.ns-android TabView {
   tab-background-color: #1c1c1e;
-}
-
-.ns-dark.ns-ios TabView {
-  border-top-color: #38383a;
 }
 
 /* Material Icons font class */
