@@ -2,11 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Material Icons font for Android tab bar */
-.ns-android TabViewItem {
-  font-family: "MaterialIcons-Regular", "materialicons-regular";
-}
-
 /* Tab bar styling — light mode */
 TabView {
   tab-text-color: #8e8e93;

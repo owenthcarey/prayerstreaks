@@ -1,6 +1,6 @@
-import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
+import { Component, NO_ERRORS_SCHEMA, OnDestroy } from '@angular/core';
 import { NativeScriptCommonModule } from '@nativescript/angular';
-import { isIOS } from '@nativescript/core';
+import { isIOS, isAndroid, TabView, ImageSource, Font, Color, Application } from '@nativescript/core';
 import { TodayComponent } from '../today/today.component';
 import { HistoryComponent } from '../history/history.component';
 import { SettingsComponent } from '../settings/settings.component';
@@ -16,32 +16,98 @@ import { SettingsComponent } from '../settings/settings.component';
   ],
   schemas: [NO_ERRORS_SCHEMA],
 })
-export class HomeComponent {
-  isIOS = isIOS;
+export class HomeComponent implements OnDestroy {
+  // iOS icons via template binding (SFSymbols); Android icons set empty here,
+  // generated programmatically in loadedTabs.
+  todayIcon = isIOS ? 'sys://checkmark.seal.fill' : '';
+  historyIcon = isIOS ? 'sys://calendar' : '';
+  settingsIcon = isIOS ? 'sys://gear' : '';
 
-  // Platform-conditional icon sources
-  // iOS: SFSymbols via sys:// prefix
-  // Android: Material Icons font glyphs via font:// prefix
-  todayIcon = isIOS
-    ? 'sys://checkmark.seal.fill'
-    : `font://${String.fromCharCode(0xe86c)}`;
-  historyIcon = isIOS
-    ? 'sys://calendar'
-    : `font://${String.fromCharCode(0xe889)}`;
-  settingsIcon = isIOS
-    ? 'sys://gear'
-    : `font://${String.fromCharCode(0xe8b8)}`;
+  // Material Icons codepoints for Android
+  private androidIcons = [
+    String.fromCharCode(0xe86c),  // check_circle  (Today)
+    String.fromCharCode(0xe889),  // history        (History)
+    String.fromCharCode(0xe8b8),  // settings       (Settings)
+  ];
 
-  loadedHome(args: any): void {
-    // Home layout loaded
+  private tabView: TabView | null = null;
+  private readonly iconFont = Font.default.withFontFamily('MaterialIcons-Regular').withFontSize(24);
+  private readonly accentColor = new Color('#2563eb');
+  private readonly grayColor = new Color('#8e8e93');
+
+  // Re-apply icons when app resumes from background (Android recreates the tab drawables)
+  private resumeHandler = () => this.updateAndroidIcons(this.tabView?.selectedIndex ?? 0);
+
+  /**
+   * WORKAROUND — NativeScript TabView Android font:// icon bug
+   * ============================================================
+   * @nativescript/core ~9.0.0, @nativescript/android 9.0.2
+   *
+   * Bug: On Android, TabView font:// icons render as invisible 12×12px bitmaps.
+   *
+   * Root cause (traced through node_modules/@nativescript/core/ui/tab-view/):
+   *
+   *   1. createTabItemSpec() in index.android.js reads icon-font-family, color,
+   *      and font-size from item.style — but those CSS properties are never
+   *      applied to TabViewItem styles by the time createTabItemSpec() first runs
+   *      during setAdapterItems(). All three are undefined.
+   *
+   *   2. Without icon-font-family, it falls back to Font.default (fontSize=undefined).
+   *      fromFontIconCodeSync() in image-source/index.android.js then renders with
+   *      Android Paint's default 12px text size and no color — producing a tiny,
+   *      effectively invisible bitmap.
+   *
+   *   3. The iconSource setter in tab-view-common.js has a change guard
+   *      (if this._iconSource !== value), so re-setting the same value after
+   *      fixing iconFontFamily does NOT trigger a re-render.
+   *
+   *   4. Calling _update() directly also doesn't help because the CSS style
+   *      properties (icon-font-family, color, font-size) remain undefined on
+   *      TabViewItem even after the loaded event fires.
+   *
+   * Note: font icons work perfectly on regular views (Label, Button, etc.) via
+   * text + font-family CSS. The bug is specific to TabView's icon rendering
+   * pipeline on Android.
+   *
+   * Workaround: Generate icon bitmaps manually with explicit font, size, and
+   * color via ImageSource.fromFontIconCodeSync(), then set them as native
+   * BitmapDrawables on each tab's tabItemSpec.
+   */
+  loadedTabs(args: any): void {
+    if (!isAndroid) return;
+    this.tabView = args.object as TabView;
+    Application.android.on('activityResumed', this.resumeHandler);
+    this.updateAndroidIcons(0);
   }
 
-  loadedTabs(args: any): void {
-    // TabView loaded
+  ngOnDestroy(): void {
+    if (isAndroid) {
+      Application.android.off('activityResumed', this.resumeHandler);
+    }
   }
 
   selectedIndexChange(args: any): void {
-    // Tab changed
+    if (!isAndroid) return;
+    this.updateAndroidIcons(this.tabView?.selectedIndex ?? 0);
+  }
+
+  private updateAndroidIcons(selected: number): void {
+    if (!this.tabView?.items) return;
+
+    this.tabView.items.forEach((item, i) => {
+      const color = i === selected ? this.accentColor : this.grayColor;
+      const imgSource = ImageSource.fromFontIconCodeSync(this.androidIcons[i], this.iconFont, color);
+      if (!imgSource) return;
+
+      const tabItemSpec = (item as any).tabItemSpec;
+      if (!tabItemSpec) return;
+
+      tabItemSpec.iconDrawable = new android.graphics.drawable.BitmapDrawable(
+        item.nativeViewProtected?.getContext()?.getResources(),
+        imgSource.android,
+      );
+      (this.tabView as any).updateAndroidItemAt(i, tabItemSpec);
+    });
   }
 }
 
