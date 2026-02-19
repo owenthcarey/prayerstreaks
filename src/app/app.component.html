@@ -1,3 +1,42 @@
-<GridLayout>
-  <page-router-outlet></page-router-outlet>
+<GridLayout rows="*, auto" class="bg-transparent">
+  <TabView
+    rowSpan="2"
+    (selectedIndexChange)="selectedIndexChange($event)"
+    (loaded)="loadedTabs($event)"
+    swipeEnabled="false"
+    class="app-background"
+    androidTabsPosition="bottom"
+    tabTextFontSize="11"
+    iosTabBarMinimizeBehavior="onScrollDown"
+  >
+    <GridLayout
+      *tabItem="{
+        title: 'Today',
+        textTransform: 'capitalize',
+        iconSource: todayIcon
+      }"
+    >
+      <page-router-outlet name="todayTab"></page-router-outlet>
+    </GridLayout>
+
+    <GridLayout
+      *tabItem="{
+        title: 'History',
+        textTransform: 'capitalize',
+        iconSource: historyIcon
+      }"
+    >
+      <page-router-outlet name="historyTab"></page-router-outlet>
+    </GridLayout>
+
+    <GridLayout
+      *tabItem="{
+        title: 'Settings',
+        textTransform: 'capitalize',
+        iconSource: settingsIcon
+      }"
+    >
+      <page-router-outlet name="settingsTab"></page-router-outlet>
+    </GridLayout>
+  </TabView>
 </GridLayout>
