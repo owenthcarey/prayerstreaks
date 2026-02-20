@@ -26,3 +26,11 @@ typings/
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# Signing credentials
+*.p12
+*.mobileprovision
+*.p8
+*.keystore
+*.jks
+signing/
