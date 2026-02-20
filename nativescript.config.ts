@@ -1,7 +1,7 @@
 import { NativeScriptConfig } from '@nativescript/core';
 
 export default {
-  id: 'org.nativescript.prayerstreaks',
+  id: 'com.prayerstreaks.app',
   appPath: 'src',
   appResourcesPath: 'App_Resources',
   android: {
