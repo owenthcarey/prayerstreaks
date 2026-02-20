@@ -21,6 +21,50 @@ TabView {
   tab-background-color: #1c1c1e;
 }
 
+/*
+ * Android Page/ActionBar dark-mode styling
+ * =========================================
+ * iOS adapts natively via UIKit, so only .ns-android is targeted.
+ *
+ * 1. REQUIRED — Page and ActionBar on Android do not auto-adapt to dark mode.
+ *    The .ns-dark.ns-android rules below are needed regardless of any bugs.
+ *
+ * 2. WORKAROUND — The .ns-android (light-mode) rules exist solely to work
+ *    around a NativeScript CSS bug and can be removed once it is fixed:
+ *
+ *    When a NativeScript app launches in dark mode, CSS properties set by
+ *    .ns-dark-qualified selectors (including Tailwind dark: utilities) become
+ *    "sticky" — switching the device to light mode removes the .ns-dark class,
+ *    but the dark values remain applied instead of reverting to their non-dark
+ *    counterparts. This only occurs in the dark-start-then-switch-to-light
+ *    direction; starting in light mode and toggling dark then back to light
+ *    works correctly, suggesting the CSS engine fails to record fallback values
+ *    for properties that are first resolved under .ns-dark.
+ *
+ *    Fix: declare explicit light-mode values so the CSS engine always has a
+ *    concrete color to switch to when .ns-dark is removed.
+ */
+
+/* [REQUIRED] Dark-mode overrides */
+.ns-dark.ns-android Page {
+  background-color: #1c1c1e;
+}
+
+.ns-dark.ns-android ActionBar {
+  background-color: #1c1c1e;
+  color: #ffffff;
+}
+
+/* [WORKAROUND] Explicit light-mode values — remove once the bug above is fixed */
+.ns-android Page {
+  background-color: #f9fafb;
+}
+
+.ns-android ActionBar {
+  background-color: #ffffff;
+  color: #333333;
+}
+
 /* Material Icons font class */
 .material-icon {
   font-family: MaterialIcons-Regular;

@@ -41,6 +41,9 @@ export class AppComponent implements OnDestroy {
   private resumeHandler = () =>
     this.updateAndroidIcons(this.tabView?.selectedIndex ?? 0);
 
+  private appearanceHandler = () =>
+    this.updateAndroidSystemBars(Application.systemAppearance() === 'dark');
+
   constructor(private routerExtensions: RouterExtensions) {}
 
   /**
@@ -82,6 +85,7 @@ export class AppComponent implements OnDestroy {
     if (isAndroid) {
       this.tabView = args.object as TabView;
       Application.android.on('activityResumed', this.resumeHandler);
+      Application.on('systemAppearanceChanged', this.appearanceHandler);
       this.updateAndroidIcons(0);
     }
 
@@ -99,12 +103,64 @@ export class AppComponent implements OnDestroy {
   ngOnDestroy(): void {
     if (isAndroid) {
       Application.android.off('activityResumed', this.resumeHandler);
+      Application.off('systemAppearanceChanged', this.appearanceHandler);
     }
   }
 
   selectedIndexChange(args: any): void {
     if (!isAndroid) return;
     this.updateAndroidIcons(this.tabView?.selectedIndex ?? 0);
+  }
+
+  /**
+   * WORKAROUND — Android system bar colors not updating on live theme switch
+   * =========================================================================
+   * NativeScript's AndroidManifest declares android:configChanges="...uiMode"
+   * so the activity is NOT recreated when the user toggles dark mode. This
+   * preserves app state but means the Android theme XML (values/values-night
+   * color resources) is never re-applied — the status bar and navigation bar
+   * keep their original colors.
+   *
+   * Fix: listen for NativeScript's 'systemAppearanceChanged' event and
+   * programmatically call Window.setStatusBarColor/setNavigationBarColor
+   * plus WindowInsetsController (API 30+) or setSystemUiVisibility (older)
+   * to flip the light/dark icon appearance.
+   */
+  private updateAndroidSystemBars(isDark: boolean): void {
+    const activity =
+      Application.android?.foregroundActivity ||
+      Application.android?.startActivity;
+    if (!activity) return;
+
+    const window = activity.getWindow();
+    const statusColor = new Color(isDark ? '#1c1c1e' : '#ffffff').android;
+    const navColor = new Color(isDark ? '#1c1c1e' : '#f8fafc').android;
+
+    window.setStatusBarColor(statusColor);
+    window.setNavigationBarColor(navColor);
+
+    if (android.os.Build.VERSION.SDK_INT >= 30) {
+      const controller = window.getInsetsController();
+      if (controller) {
+        const LIGHT_BARS =
+          android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS |
+          android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+        controller.setSystemBarsAppearance(isDark ? 0 : LIGHT_BARS, LIGHT_BARS);
+      }
+    } else {
+      const decorView = window.getDecorView();
+      let flags = decorView.getSystemUiVisibility();
+      const LIGHT_STATUS_BAR = 0x00002000;
+      const LIGHT_NAV_BAR = 0x00000010;
+      if (isDark) {
+        flags &= ~LIGHT_STATUS_BAR;
+        flags &= ~LIGHT_NAV_BAR;
+      } else {
+        flags |= LIGHT_STATUS_BAR;
+        flags |= LIGHT_NAV_BAR;
+      }
+      decorView.setSystemUiVisibility(flags);
+    }
   }
 
   private updateAndroidIcons(selected: number): void {

@@ -6,6 +6,8 @@
         <!-- Uncomment this to make the app show underneat the status bar -->
         <!-- <item name="android:windowTranslucentStatus">true</item> -->
 
+        <item name="android:navigationBarColor">@color/ns_primary</item>
+
         <item name="android:datePickerStyle">@style/SpinnerDatePicker</item>
         <item name="android:timePickerStyle">@style/SpinnerTimePicker</item>
     </style>
