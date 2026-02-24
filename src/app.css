@@ -4,21 +4,25 @@
 
 /* Tab bar styling — shared */
 TabView {
-  tab-text-color: #8e8e93;
   selected-tab-text-color: #2563eb;
 }
 
-/* iOS: no tab-background-color, no border overrides — let UITabBarController
-   provide its native translucent blur, separator, and dark-mode adaptation. */
+/* iOS: let UITabBarController provide its native translucent blur, separator,
+   dark-mode adaptation, and default inactive text color. */
+.ns-ios TabView {
+  tab-text-color: #8e8e93;
+}
 
-/* Android */
+/* Android: match Material 3 BottomNavigationView appearance */
 .ns-android TabView {
   tab-background-color: #f2f2f7;
-  android-selected-tab-highlight-color: #2563eb;
+  tab-text-color: #49454F;
+  android-selected-tab-highlight-color: transparent;
 }
 
 .ns-dark.ns-android TabView {
   tab-background-color: #000000;
+  tab-text-color: #CAC4D0;
 }
 
 /*
@@ -61,7 +65,7 @@ TabView {
 }
 
 .ns-android ActionBar {
-  background-color: #ffffff;
+  background-color: #f2f2f7;
   color: #333333;
 }
 

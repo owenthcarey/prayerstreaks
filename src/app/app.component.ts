@@ -36,13 +36,15 @@ export class AppComponent implements OnDestroy {
     .withFontFamily('MaterialIcons-Regular')
     .withFontSize(24);
   private readonly accentColor = new Color('#2563eb');
-  private readonly grayColor = new Color('#8e8e93');
 
   private resumeHandler = () =>
     this.updateAndroidIcons(this.tabView?.selectedIndex ?? 0);
 
-  private appearanceHandler = () =>
-    this.updateAndroidSystemBars(Application.systemAppearance() === 'dark');
+  private appearanceHandler = () => {
+    const isDark = Application.systemAppearance() === 'dark';
+    this.updateAndroidSystemBars(isDark);
+    this.updateAndroidIcons(this.tabView?.selectedIndex ?? 0);
+  };
 
   constructor(private routerExtensions: RouterExtensions) {}
 
@@ -133,7 +135,7 @@ export class AppComponent implements OnDestroy {
     if (!activity) return;
 
     const window = activity.getWindow();
-    const statusColor = new Color(isDark ? '#000000' : '#ffffff').android;
+    const statusColor = new Color(isDark ? '#000000' : '#f2f2f7').android;
     const navColor = new Color(isDark ? '#000000' : '#f2f2f7').android;
 
     window.setStatusBarColor(statusColor);
@@ -167,7 +169,10 @@ export class AppComponent implements OnDestroy {
     if (!this.tabView?.items) return;
 
     this.tabView.items.forEach((item, i) => {
-      const color = i === selected ? this.accentColor : this.grayColor;
+      const inactiveColor = Application.systemAppearance() === 'dark'
+        ? '#CAC4D0'
+        : '#49454F';
+      const color = i === selected ? this.accentColor : new Color(inactiveColor);
       const imgSource = ImageSource.fromFontIconCodeSync(
         this.androidIcons[i],
         this.iconFont,
