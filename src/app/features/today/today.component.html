@@ -32,6 +32,35 @@
         text="One prayerful day at a time."
         class="text-center text-sm text-gray-400 dark:text-gray-500 mt-2"
       ></Label>
+      @if (checkinService.currentStreak() > 0) {
+        <GridLayout columns="auto, auto" horizontalAlignment="center" class="mt-5" (tap)="onShare()">
+          <!-- iOS: SF Symbol -->
+          <Image
+            *ngIf="isIOS"
+            col="0"
+            src="sys://square.and.arrow.up"
+            tintColor="#f97316"
+            width="18" height="18"
+            verticalAlignment="center"
+            class="mr-1"
+          ></Image>
+          <!-- Android: Material Icon -->
+          <Label
+            *ngIf="!isIOS"
+            col="0"
+            [text]="shareIcon"
+            class="material-icon text-orange-500 mr-1"
+            style="font-size: 18"
+            verticalAlignment="center"
+          ></Label>
+          <Label
+            col="1"
+            text="Share"
+            class="text-base text-orange-500 font-semibold"
+            verticalAlignment="center"
+          ></Label>
+        </GridLayout>
+      }
     </StackLayout>
 
     @if (!checkinService.checkedInToday()) {

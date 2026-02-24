@@ -9,6 +9,7 @@ import {
 import { NativeScriptCommonModule } from '@nativescript/angular';
 import { isIOS } from '@nativescript/core';
 import { CheckInService } from '../../core/services/checkin.service';
+import { ShareService } from '../../core/services/share.service';
 import { PrayerType, prayerTypeLabel } from '../../core/models/checkin.model';
 
 @Component({
@@ -20,11 +21,13 @@ import { PrayerType, prayerTypeLabel } from '../../core/models/checkin.model';
 })
 export class TodayComponent {
   checkinService = inject(CheckInService);
+  private shareService = inject(ShareService);
   selectedType = signal<PrayerType | undefined>(undefined);
 
   isIOS = isIOS;
   flameIcon = String.fromCharCode(0xef55);  // local_fire_department
   checkIcon = String.fromCharCode(0xe86c);  // check_circle
+  shareIcon = String.fromCharCode(0xe80d);  // share
 
   prayerTypeLabel = prayerTypeLabel;
 
@@ -43,6 +46,13 @@ export class TodayComponent {
 
   onCheckIn(): void {
     this.checkinService.checkIn(this.selectedType());
+  }
+
+  onShare(): void {
+    this.shareService.shareStreak(
+      this.checkinService.currentStreak(),
+      this.checkinService.longestStreak()
+    );
   }
 }
 
