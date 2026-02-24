@@ -4,10 +4,20 @@
   <StackLayout class="px-5 pt-5 pb-8">
     <!-- Streak display -->
     <StackLayout class="text-center p-6 rounded-2xl bg-white dark:bg-[#1c1c1e] mb-6">
+      <!-- iOS: SF Symbol -->
+      <Image
+        *ngIf="isIOS"
+        src="sys://flame.fill"
+        tintColor="#f97316"
+        width="52" height="52"
+        class="mb-1"
+      ></Image>
+      <!-- Android: Material Icon -->
       <Label
-        text="🔥"
-        class="text-center"
-        style="font-size: 58"
+        *ngIf="!isIOS"
+        [text]="flameIcon"
+        class="material-icon text-center text-orange-500 mb-1"
+        style="font-size: 52"
       ></Label>
       <Label
         [text]="checkinService.currentStreak()"
@@ -54,10 +64,20 @@
     } @else {
       <!-- Confirmation -->
       <StackLayout class="text-center p-8 rounded-2xl bg-white dark:bg-[#1c1c1e]">
+        <!-- iOS: SF Symbol -->
+        <Image
+          *ngIf="isIOS"
+          src="sys://checkmark.circle.fill"
+          tintColor="#22c55e"
+          width="52" height="52"
+          class="mb-1"
+        ></Image>
+        <!-- Android: Material Icon -->
         <Label
-          text="✅"
-          class="text-center"
-          style="font-size: 58"
+          *ngIf="!isIOS"
+          [text]="checkIcon"
+          class="material-icon text-center text-green-500 mb-1"
+          style="font-size: 52"
         ></Label>
         <Label
           text="Checked in today!"
