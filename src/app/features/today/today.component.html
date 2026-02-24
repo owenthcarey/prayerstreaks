@@ -3,7 +3,7 @@
 <ScrollView>
   <StackLayout class="px-5 pt-5 pb-8">
     <!-- Streak display -->
-    <StackLayout class="text-center p-6 rounded-2xl bg-white dark:bg-[#2c2c2e] mb-6">
+    <StackLayout class="text-center p-6 rounded-2xl bg-white dark:bg-[#1c1c1e] mb-6">
       <Label
         text="🔥"
         class="text-center"
@@ -38,7 +38,7 @@
               'mr-2 mb-2 py-2 px-4 rounded-full text-base font-medium border ' +
               (selectedType() === type
                 ? 'bg-blue-600 text-white border-blue-600'
-                : 'bg-white dark:bg-[#2c2c2e] text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600')
+                : 'bg-white dark:bg-[#1c1c1e] text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600')
             "
             (tap)="selectType(type)"
           ></Label>
@@ -53,7 +53,7 @@
       ></Button>
     } @else {
       <!-- Confirmation -->
-      <StackLayout class="text-center p-8 rounded-2xl bg-white dark:bg-[#2c2c2e]">
+      <StackLayout class="text-center p-8 rounded-2xl bg-white dark:bg-[#1c1c1e]">
         <Label
           text="✅"
           class="text-center"

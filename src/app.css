@@ -13,12 +13,12 @@ TabView {
 
 /* Android */
 .ns-android TabView {
-  tab-background-color: #f8fafc;
+  tab-background-color: #f2f2f7;
   android-selected-tab-highlight-color: #2563eb;
 }
 
 .ns-dark.ns-android TabView {
-  tab-background-color: #1c1c1e;
+  tab-background-color: #000000;
 }
 
 /*
@@ -47,22 +47,32 @@ TabView {
 
 /* [REQUIRED] Dark-mode overrides */
 .ns-dark.ns-android Page {
-  background-color: #1c1c1e;
+  background-color: #000000;
 }
 
 .ns-dark.ns-android ActionBar {
-  background-color: #1c1c1e;
+  background-color: #000000;
   color: #ffffff;
 }
 
 /* [WORKAROUND] Explicit light-mode values — remove once the bug above is fixed */
 .ns-android Page {
-  background-color: #f9fafb;
+  background-color: #f2f2f7;
 }
 
 .ns-android ActionBar {
   background-color: #ffffff;
   color: #333333;
+}
+
+/* iOS Page background — UIKit defaults to opaque white, which is too close to
+   the bg-white cards.  Use the iOS "grouped" background gray so cards pop. */
+.ns-ios Page {
+  background-color: #f2f2f7;
+}
+
+.ns-dark.ns-ios Page {
+  background-color: #000000;
 }
 
 /* Material Icons font class */
@@ -72,9 +82,9 @@ TabView {
 
 /* App background */
 .app-background {
-  background-color: #f9fafb;
+  background-color: #f2f2f7;
 }
 
 .ns-dark .app-background {
-  background-color: #1c1c1e;
+  background-color: #000000;
 }

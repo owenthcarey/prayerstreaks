@@ -133,8 +133,8 @@ export class AppComponent implements OnDestroy {
     if (!activity) return;
 
     const window = activity.getWindow();
-    const statusColor = new Color(isDark ? '#1c1c1e' : '#ffffff').android;
-    const navColor = new Color(isDark ? '#1c1c1e' : '#f8fafc').android;
+    const statusColor = new Color(isDark ? '#000000' : '#ffffff').android;
+    const navColor = new Color(isDark ? '#000000' : '#f2f2f7').android;
 
     window.setStatusBarColor(statusColor);
     window.setNavigationBarColor(navColor);
