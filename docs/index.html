@@ -496,6 +496,37 @@
       margin-bottom: 0;
     }
 
+    /* --- Support --- */
+    .support {
+      text-align: center;
+      padding: 4rem 1.5rem;
+      background: #fff;
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .support .section-heading {
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      margin-bottom: 0.5rem;
+    }
+
+    .support p {
+      font-size: 1rem;
+      color: #64748b;
+      line-height: 1.7;
+      max-width: 460px;
+      margin: 0 auto;
+    }
+
+    .support a {
+      color: #e8590c;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .support a:hover {
+      text-decoration: underline;
+    }
+
     /* --- Footer --- */
     footer {
       text-align: center;
@@ -503,6 +534,15 @@
       font-size: 0.85rem;
       color: #94a3b8;
       background: #f1f5f9;
+    }
+
+    footer a {
+      color: #94a3b8;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      color: #64748b;
     }
 
     /* --- Scroll Animations --- */
@@ -595,7 +635,10 @@
       </svg>
       Prayer Streaks
     </a>
-    <a href="#download" class="nav-cta">Download</a>
+    <div style="display:flex;align-items:center;gap:1.5rem;">
+      <a href="#support" style="font-size:0.875rem;font-weight:600;color:#64748b;text-decoration:none;">Support</a>
+      <a href="#download" class="nav-cta">Download</a>
+    </div>
   </nav>
 
   <!-- Hero -->
@@ -715,9 +758,15 @@
     </div>
   </section>
 
+  <!-- Support -->
+  <section class="support" id="support">
+    <h2 class="section-heading">Support</h2>
+    <p>Questions, feedback, or need help? Reach out at <a href="mailto:contact@jamiphy.com">contact@jamiphy.com</a> and we'll get back to you as soon as we can.</p>
+  </section>
+
   <!-- Footer -->
   <footer>
-    <p>&copy; 2026 Prayer Streaks</p>
+    <p>&copy; 2026 Prayer Streaks &nbsp;&middot;&nbsp; <a href="mailto:contact@jamiphy.com">Contact</a></p>
   </footer>
 
   <script>
