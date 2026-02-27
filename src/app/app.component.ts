@@ -1,4 +1,4 @@
-import { Component, NO_ERRORS_SCHEMA, OnDestroy } from '@angular/core';
+import { Component, NO_ERRORS_SCHEMA, OnDestroy, inject } from '@angular/core';
 import {
   NativeScriptCommonModule,
   PageRouterOutlet,
@@ -13,6 +13,7 @@ import {
   Color,
   Application,
 } from '@nativescript/core';
+import { CheckInService } from './core/services/checkin.service';
 
 @Component({
   selector: 'ns-app',
@@ -46,7 +47,12 @@ export class AppComponent implements OnDestroy {
     this.updateAndroidIcons(this.tabView?.selectedIndex ?? 0);
   };
 
-  constructor(private routerExtensions: RouterExtensions) {}
+  // TEMPORARY — seed demo data for App Store screenshots. Remove after.
+  private checkinService = inject(CheckInService);
+
+  constructor(private routerExtensions: RouterExtensions) {
+    this.checkinService.seedDemoData();
+  }
 
   /**
    * WORKAROUND — NativeScript TabView Android font:// icon bug

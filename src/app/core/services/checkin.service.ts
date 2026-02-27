@@ -95,6 +95,54 @@ export class CheckInService {
     this.prayerTypes.set([...DEFAULT_PRAYER_TYPES]);
   }
 
+  // TEMPORARY — seed demo data for App Store screenshots. Remove after.
+  seedDemoData(): void {
+    const days: { date: string; prayerType?: PrayerType }[] = [
+      // Jan 29 – Feb 1  (4-day streak)
+      { date: '2026-01-29', prayerType: 'rosary' },
+      { date: '2026-01-30', prayerType: 'scripture' },
+      { date: '2026-01-31', prayerType: 'mass' },
+      { date: '2026-02-01', prayerType: 'rosary' },
+      // Feb 2: missed
+      // Feb 3 – Feb 13  (11-day streak — longest)
+      { date: '2026-02-03', prayerType: 'adoration' },
+      { date: '2026-02-04', prayerType: 'rosary' },
+      { date: '2026-02-05', prayerType: 'scripture' },
+      { date: '2026-02-06', prayerType: 'mass' },
+      { date: '2026-02-07', prayerType: 'rosary' },
+      { date: '2026-02-08', prayerType: 'scripture' },
+      { date: '2026-02-09', prayerType: 'rosary' },
+      { date: '2026-02-10', prayerType: 'adoration' },
+      { date: '2026-02-11', prayerType: 'mass' },
+      { date: '2026-02-12', prayerType: 'rosary' },
+      { date: '2026-02-13', prayerType: 'scripture' },
+      // Feb 14–15: missed
+      // Feb 16–18  (3-day streak)
+      { date: '2026-02-16', prayerType: 'rosary' },
+      { date: '2026-02-17', prayerType: 'mass' },
+      { date: '2026-02-18', prayerType: 'scripture' },
+      // Feb 19: missed
+      // Feb 20–26  (7-day current streak)
+      { date: '2026-02-20', prayerType: 'rosary' },
+      { date: '2026-02-21', prayerType: 'adoration' },
+      { date: '2026-02-22', prayerType: 'scripture' },
+      { date: '2026-02-23', prayerType: 'mass' },
+      { date: '2026-02-24', prayerType: 'rosary' },
+      { date: '2026-02-25', prayerType: 'scripture' },
+      { date: '2026-02-26', prayerType: 'rosary' },
+      // Feb 27 (today): NOT checked in — keeps the button active for screenshot
+    ];
+
+    const checkins: CheckIn[] = days.map((d) => ({
+      date: d.date,
+      checkedInAt: new Date(d.date + 'T08:00:00').getTime(),
+      ...(d.prayerType ? { prayerType: d.prayerType } : {}),
+    }));
+
+    this.checkIns.set(checkins);
+    this.saveCheckIns(checkins);
+  }
+
   private loadCheckIns(): CheckIn[] {
     return this.storage.getJSON<CheckIn[]>(CHECKINS_KEY, []);
   }
