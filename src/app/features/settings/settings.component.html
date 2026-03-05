@@ -162,6 +162,67 @@
       }
     </StackLayout>
 
+    <!-- Milestones Section -->
+    <Label
+      text="Milestones"
+      class="text-2xl font-bold mb-4 dark:text-white"
+    ></Label>
+    <StackLayout class="rounded-2xl bg-white dark:bg-[#1c1c1e] px-4 py-3 mb-6">
+      @for (milestone of milestoneService.allMilestones(); track milestone.id) {
+        <GridLayout columns="auto, *, auto, auto" class="py-3 px-1 border-b border-gray-100 dark:border-gray-700">
+          <!-- iOS: SFSymbol -->
+          <Image
+            *ngIf="isIOS"
+            col="0"
+            [src]="milestone.unlocked ? 'sys://star.fill' : 'sys://lock.fill'"
+            [tintColor]="milestone.unlocked ? '#f59e0b' : '#9ca3af'"
+            width="22" height="22"
+          ></Image>
+          <!-- Android: Material Icon -->
+          <Label
+            *ngIf="!isIOS"
+            col="0"
+            [text]="milestone.unlocked ? starIcon : lockIcon"
+            class="material-icon"
+            style="font-size: 22"
+            [class.text-amber-500]="milestone.unlocked"
+            [class.text-gray-400]="!milestone.unlocked"
+            width="24"
+          ></Label>
+          <Label
+            col="1"
+            [text]="milestone.title"
+            class="text-base ml-3"
+            [class.text-gray-800]="milestone.unlocked"
+            [class.dark:text-gray-200]="milestone.unlocked"
+            [class.text-gray-400]="!milestone.unlocked"
+            [class.dark:text-gray-500]="!milestone.unlocked"
+          ></Label>
+          <Label
+            col="2"
+            [text]="milestone.days + 'd'"
+            class="text-sm text-gray-400 dark:text-gray-500 mr-2"
+          ></Label>
+          <!-- iOS: check mark -->
+          <Image
+            *ngIf="isIOS && milestone.unlocked"
+            col="3"
+            src="sys://checkmark"
+            tintColor="#22c55e"
+            width="16" height="16"
+          ></Image>
+          <!-- Android: check mark -->
+          <Label
+            *ngIf="!isIOS && milestone.unlocked"
+            col="3"
+            [text]="checkSmallIcon"
+            class="material-icon text-green-500"
+            style="font-size: 16"
+          ></Label>
+        </GridLayout>
+      }
+    </StackLayout>
+
     <!-- App Info Section -->
     <Label
       text="App Info"

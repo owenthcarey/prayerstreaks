@@ -7,6 +7,7 @@ import {
 import { NativeScriptCommonModule } from '@nativescript/angular';
 import { Dialogs, isIOS } from '@nativescript/core';
 import { CheckInService } from '../../core/services/checkin.service';
+import { MilestoneService } from '../../core/services/milestone.service';
 import { ReminderService } from '../../core/services/reminder.service';
 import { PrayerType, prayerTypeLabel } from '../../core/models/checkin.model';
 
@@ -19,6 +20,7 @@ import { PrayerType, prayerTypeLabel } from '../../core/models/checkin.model';
 })
 export class SettingsComponent {
   checkinService = inject(CheckInService);
+  milestoneService = inject(MilestoneService);
   reminderService = inject(ReminderService);
   prayerTypeLabel = prayerTypeLabel;
 
@@ -27,6 +29,9 @@ export class SettingsComponent {
   cancelIcon = String.fromCharCode(0xe5c9);
   addIcon = String.fromCharCode(0xe145);
   shieldIcon = String.fromCharCode(0xe8e8); // verified_user
+  starIcon = String.fromCharCode(0xe838);   // star
+  lockIcon = String.fromCharCode(0xe897);   // lock
+  checkSmallIcon = String.fromCharCode(0xe5ca); // check
 
   private updatingReminder = false;
   private timeChangeTimeout: ReturnType<typeof setTimeout> | undefined;
@@ -97,6 +102,7 @@ export class SettingsComponent {
       if (this.reminderService.enabled()) {
         await this.reminderService.toggle(false);
       }
+      this.milestoneService.resetAll();
       this.checkinService.resetAll();
     }
   }

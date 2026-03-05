@@ -9,6 +9,7 @@ import {
 import { NativeScriptCommonModule } from '@nativescript/angular';
 import { isIOS } from '@nativescript/core';
 import { CheckInService } from '../../core/services/checkin.service';
+import { MilestoneService } from '../../core/services/milestone.service';
 import { ReminderService } from '../../core/services/reminder.service';
 import { ShareService } from '../../core/services/share.service';
 import { PrayerType, prayerTypeLabel } from '../../core/models/checkin.model';
@@ -22,6 +23,7 @@ import { PrayerType, prayerTypeLabel } from '../../core/models/checkin.model';
 })
 export class TodayComponent {
   checkinService = inject(CheckInService);
+  milestoneService = inject(MilestoneService);
   private reminderService = inject(ReminderService);
   private shareService = inject(ShareService);
   selectedType = signal<PrayerType | undefined>(undefined);
@@ -31,6 +33,7 @@ export class TodayComponent {
   checkIcon = String.fromCharCode(0xe86c);  // check_circle
   shareIcon = String.fromCharCode(0xe80d);  // share
   shieldIcon = String.fromCharCode(0xe8e8); // verified_user
+  starIcon = String.fromCharCode(0xe838);   // star
 
   prayerTypeLabel = prayerTypeLabel;
 
@@ -46,6 +49,19 @@ export class TodayComponent {
     return count === 1 ? '1 shield' : `${count} shields`;
   });
 
+  nextMilestoneText = computed(() => {
+    const next = this.milestoneService.nextMilestone();
+    if (!next) return null;
+    const remaining = next.days - this.checkinService.currentStreak();
+    if (remaining <= 0) return `${next.title} \u2014 check in to unlock!`;
+    return `${next.title} in ${remaining} ${remaining === 1 ? 'day' : 'days'}`;
+  });
+
+  celebrationDaysText = computed(() => {
+    const m = this.milestoneService.pendingCelebration();
+    return m ? `${m.days}-day streak achieved!` : '';
+  });
+
   selectType(type: PrayerType): void {
     this.selectedType.set(
       this.selectedType() === type ? undefined : type
@@ -54,7 +70,12 @@ export class TodayComponent {
 
   onCheckIn(): void {
     this.checkinService.checkIn(this.selectedType());
+    this.milestoneService.checkForNewMilestones();
     this.reminderService.rescheduleIfEnabled();
+  }
+
+  dismissCelebration(): void {
+    this.milestoneService.dismissCelebration();
   }
 
   onShare(): void {
