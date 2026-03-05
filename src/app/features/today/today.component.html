@@ -32,6 +32,34 @@
         text="One prayerful day at a time."
         class="text-center text-sm text-gray-400 dark:text-gray-500 mt-2"
       ></Label>
+      @if (checkinService.shieldsEnabled()) {
+        <GridLayout columns="auto, auto" horizontalAlignment="center" class="mt-3">
+          <!-- iOS: SF Symbol -->
+          <Image
+            *ngIf="isIOS"
+            col="0"
+            src="sys://shield.fill"
+            tintColor="#8b5cf6"
+            width="16" height="16"
+            verticalAlignment="center"
+          ></Image>
+          <!-- Android: Material Icon -->
+          <Label
+            *ngIf="!isIOS"
+            col="0"
+            [text]="shieldIcon"
+            class="material-icon text-purple-500"
+            style="font-size: 16"
+            verticalAlignment="center"
+          ></Label>
+          <Label
+            col="1"
+            [text]="shieldCountText()"
+            class="text-sm text-purple-500 font-medium ml-1"
+            verticalAlignment="center"
+          ></Label>
+        </GridLayout>
+      }
       @if (checkinService.currentStreak() > 0) {
         <GridLayout columns="auto, auto" horizontalAlignment="center" class="mt-5" (tap)="onShare()">
           <!-- iOS: SF Symbol -->

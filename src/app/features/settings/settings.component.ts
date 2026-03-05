@@ -26,6 +26,7 @@ export class SettingsComponent {
 
   cancelIcon = String.fromCharCode(0xe5c9);
   addIcon = String.fromCharCode(0xe145);
+  shieldIcon = String.fromCharCode(0xe8e8); // verified_user
 
   private updatingReminder = false;
   private timeChangeTimeout: ReturnType<typeof setTimeout> | undefined;
@@ -62,6 +63,10 @@ export class SettingsComponent {
         this.reminderService.updateTime(tp.hour, tp.minute);
       }, 500);
     });
+  }
+
+  onShieldToggle(args: any): void {
+    this.checkinService.setShieldsEnabled(args.value);
   }
 
   async addCustomType(): Promise<void> {
