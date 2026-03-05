@@ -30,6 +30,7 @@ export class TodayComponent {
   flameIcon = String.fromCharCode(0xef55);  // local_fire_department
   checkIcon = String.fromCharCode(0xe86c);  // check_circle
   shareIcon = String.fromCharCode(0xe80d);  // share
+  shieldIcon = String.fromCharCode(0xe8e8); // verified_user
 
   prayerTypeLabel = prayerTypeLabel;
 
@@ -38,6 +39,11 @@ export class TodayComponent {
     if (streak === 0) return 'Start your streak!';
     if (streak === 1) return '1-day streak!';
     return `${streak}-day streak!`;
+  });
+
+  shieldCountText = computed(() => {
+    const count = this.checkinService.shieldCount();
+    return count === 1 ? '1 shield' : `${count} shields`;
   });
 
   selectType(type: PrayerType): void {

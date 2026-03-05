@@ -108,6 +108,60 @@
       }
     </StackLayout>
 
+    <!-- Streak Shields Section -->
+    <Label
+      text="Streak Shields"
+      class="text-2xl font-bold mb-4 dark:text-white"
+    ></Label>
+    <StackLayout class="rounded-2xl bg-white dark:bg-[#1c1c1e] px-4 py-3 mb-6">
+      <GridLayout columns="*, auto" class="py-2 px-1">
+        <Label
+          col="0"
+          text="Use Streak Shields"
+          class="text-base text-gray-800 dark:text-gray-200"
+          verticalAlignment="center"
+        ></Label>
+        <Switch
+          col="1"
+          [checked]="checkinService.shieldsEnabled()"
+          (checkedChange)="onShieldToggle($event)"
+        ></Switch>
+      </GridLayout>
+      <Label
+        text="Earn 1 shield every 7 days (max 3). Shields auto-protect your streak when you miss a day."
+        class="text-sm text-gray-500 dark:text-gray-400 px-1 pb-2"
+        textWrap="true"
+      ></Label>
+      @if (checkinService.shieldsEnabled()) {
+        <GridLayout columns="auto, auto, *" class="border-t border-gray-100 dark:border-gray-700 pt-3 px-1 pb-1">
+          <!-- iOS: SF Symbol -->
+          <Image
+            *ngIf="isIOS"
+            col="0"
+            src="sys://shield.fill"
+            tintColor="#8b5cf6"
+            width="18" height="18"
+            verticalAlignment="center"
+          ></Image>
+          <!-- Android: Material Icon -->
+          <Label
+            *ngIf="!isIOS"
+            col="0"
+            [text]="shieldIcon"
+            class="material-icon text-purple-500"
+            style="font-size: 18"
+            verticalAlignment="center"
+          ></Label>
+          <Label
+            col="1"
+            [text]="checkinService.shieldCount() + ' available'"
+            class="text-base text-purple-500 font-semibold ml-2"
+            verticalAlignment="center"
+          ></Label>
+        </GridLayout>
+      }
+    </StackLayout>
+
     <!-- App Info Section -->
     <Label
       text="App Info"

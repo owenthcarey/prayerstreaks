@@ -50,19 +50,20 @@
           <Image
             *ngIf="isIOS"
             col="0"
-            [src]="item.checked ? 'sys://checkmark.circle.fill' : 'sys://xmark'"
-            [tintColor]="item.checked ? '#22c55e' : '#ef4444'"
+            [src]="item.shielded ? 'sys://shield.fill' : item.checked ? 'sys://checkmark.circle.fill' : 'sys://xmark'"
+            [tintColor]="item.shielded ? '#8b5cf6' : item.checked ? '#22c55e' : '#ef4444'"
             width="20" height="20"
           ></Image>
           <!-- Android: Material Icons -->
           <Label
             *ngIf="!isIOS"
             col="0"
-            [text]="item.checked ? checkIcon : closeIcon"
+            [text]="item.shielded ? shieldIcon : item.checked ? checkIcon : closeIcon"
             class="material-icon"
             style="font-size: 20"
-            [class.text-green-500]="item.checked"
-            [class.text-red-500]="!item.checked"
+            [class.text-green-500]="item.checked && !item.shielded"
+            [class.text-red-500]="!item.checked && !item.shielded"
+            [class.text-purple-500]="item.shielded"
             width="24"
           ></Label>
           <Label

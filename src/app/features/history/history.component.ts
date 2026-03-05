@@ -21,6 +21,7 @@ export interface HistoryItem {
   displayDate: string;
   monthYear: string;
   checked: boolean;
+  shielded: boolean;
   prayerType?: string;
   isMonthHeader: boolean;
 }
@@ -37,9 +38,9 @@ export class HistoryComponent {
 
   isIOS = isIOS;
 
-  // Material Icons glyphs (Android)
   checkIcon = String.fromCharCode(0xe86c);   // check_circle
   closeIcon = String.fromCharCode(0xe5cd);   // close
+  shieldIcon = String.fromCharCode(0xe8e8);  // verified_user
 
   historyItems = computed(() => {
     const checkIns = this.checkinService.checkIns();
@@ -48,23 +49,25 @@ export class HistoryComponent {
       checkInMap.set(c.date, c);
     }
 
+    const shieldedSet = new Set(this.checkinService.shieldedDates());
+    const shieldsOn = this.checkinService.shieldsEnabled();
+
     const items: HistoryItem[] = [];
     const today = getTodayISO();
     let lastMonth = '';
 
-    // Show last 30 days
     for (let i = 0; i < 30; i++) {
       const date = addDays(today, -i);
       const monthYear = getMonthYear(date);
       const checkIn = checkInMap.get(date);
 
-      // Insert month header when the month changes
       if (monthYear !== lastMonth) {
         items.push({
           date: '',
           displayDate: '',
           monthYear,
           checked: false,
+          shielded: false,
           isMonthHeader: true,
         });
         lastMonth = monthYear;
@@ -75,6 +78,7 @@ export class HistoryComponent {
         displayDate: formatDisplayDate(date),
         monthYear,
         checked: !!checkIn,
+        shielded: !checkIn && shieldsOn && shieldedSet.has(date),
         prayerType: checkIn?.prayerType
           ? prayerTypeLabel(checkIn.prayerType)
           : undefined,
