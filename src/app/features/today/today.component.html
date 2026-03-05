@@ -97,6 +97,109 @@
       }
     </StackLayout>
 
+    <!-- Share card picker panel -->
+    @if (showSharePanel()) {
+      <StackLayout class="p-5 rounded-2xl bg-white dark:bg-[#1c1c1e] mb-6">
+        <Label
+          text="Share Your Prayer"
+          class="text-center text-lg font-bold text-gray-800 dark:text-gray-200 mb-4"
+        ></Label>
+
+        <!-- Card type selector -->
+        <Label
+          text="Card Style"
+          class="text-sm text-gray-500 dark:text-gray-400 ml-1 mb-2"
+        ></Label>
+        <WrapLayout class="mb-4">
+          @for (type of availableCardTypes(); track type) {
+            <Label
+              [text]="cardTypeLabels[type]"
+              [class]="
+                'mr-2 mb-2 py-2 px-4 rounded-full text-sm font-medium border ' +
+                (selectedCardType() === type
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-gray-50 dark:bg-[#2c2c2e] text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600')
+              "
+              (tap)="selectCardType(type)"
+            ></Label>
+          }
+        </WrapLayout>
+
+        <!-- Color theme selector -->
+        <Label
+          text="Color"
+          class="text-sm text-gray-500 dark:text-gray-400 ml-1 mb-2"
+        ></Label>
+        <WrapLayout class="mb-4 ml-1">
+          @for (g of gradients; track g.id) {
+            <StackLayout
+              [width]="selectedTheme() === g.id ? 44 : 36"
+              [height]="selectedTheme() === g.id ? 44 : 36"
+              [borderRadius]="selectedTheme() === g.id ? 22 : 18"
+              [backgroundColor]="g.color1"
+              [opacity]="selectedTheme() === g.id ? 1 : 0.5"
+              class="mr-3 mb-1"
+              verticalAlignment="center"
+              (tap)="selectTheme(g.id)"
+            ></StackLayout>
+          }
+        </WrapLayout>
+
+        <!-- Format selector -->
+        <Label
+          text="Format"
+          class="text-sm text-gray-500 dark:text-gray-400 ml-1 mb-2"
+        ></Label>
+        <GridLayout columns="*, *" class="mb-5">
+          <Label
+            col="0"
+            text="Story 9:16"
+            [class]="
+              'text-center py-2 rounded-lg mr-1 text-sm font-medium border ' +
+              (selectedFormat() === 'story'
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-gray-50 dark:bg-[#2c2c2e] text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600')
+            "
+            (tap)="selectFormat('story')"
+          ></Label>
+          <Label
+            col="1"
+            text="Feed 1:1"
+            [class]="
+              'text-center py-2 rounded-lg ml-1 text-sm font-medium border ' +
+              (selectedFormat() === 'feed'
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'bg-gray-50 dark:bg-[#2c2c2e] text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600')
+            "
+            (tap)="selectFormat('feed')"
+          ></Label>
+        </GridLayout>
+
+        <!-- Share buttons -->
+        <GridLayout columns="3*, 2*" class="mb-3">
+          <Button
+            col="0"
+            text="Share"
+            (tap)="onShareNow()"
+            class="bg-blue-600 text-white text-base p-3 rounded-xl font-semibold mr-2"
+          ></Button>
+          <Button
+            col="1"
+            text="IG Story"
+            textTransform="none"
+            (tap)="onShareInstagram()"
+            class="bg-purple-600 text-white text-base p-3 rounded-xl font-semibold"
+          ></Button>
+        </GridLayout>
+
+        <Label
+          text="Close"
+          class="text-center text-sm text-gray-400 dark:text-gray-500 mt-1"
+          (tap)="closeSharePanel()"
+        ></Label>
+      </StackLayout>
+    }
+
     @if (!checkinService.checkedInToday()) {
       <!-- Prayer type selector -->
       <Label
@@ -155,7 +258,7 @@
             [text]="celebrationDaysText()"
             class="text-center text-sm text-amber-600 dark:text-amber-400 mt-1"
           ></Label>
-          <GridLayout columns="auto, auto" horizontalAlignment="center" class="mt-5" (tap)="onShare()">
+          <GridLayout columns="auto, auto" horizontalAlignment="center" class="mt-5" (tap)="onShare('milestone')">
             <!-- iOS: SF Symbol -->
             <Image
               *ngIf="isIOS"

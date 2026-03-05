@@ -122,7 +122,7 @@ extensions alongside the NativeScript app.
 
 These features turn every engaged user into a distribution channel.
 
-### 2.1 Enhanced Share Cards - [ ]
+### 2.1 Enhanced Share Cards - [x]
 
 **Why:** The current share image is functional but generic. Beautiful,
 personalized share cards get posted to Instagram Stories, iMessage, and Twitter —
