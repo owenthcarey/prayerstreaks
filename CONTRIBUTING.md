@@ -52,3 +52,38 @@ feat!: migrate streak history schema to include prayer type
 
 BREAKING CHANGE: old local data is incompatible and requires migration.
 ```
+
+## Branching rules
+
+- `main`: default branch.
+- Feature branches: `feature/...` from `main`; hotfixes: `hotfix/...` from `main`.
+
+### Branch naming
+
+- Use lowercase kebab-case; no spaces; keep names concise (aim ≤ 40 chars).
+- Suggested prefixes (align with Conventional Commit categories):
+  - `feature/<scope>-<short-desc>`
+  - `fix/<issue-or-bug>-<short-desc>`
+  - `chore/<short-desc>`
+  - `docs/<short-desc>`
+  - `ci/<short-desc>`
+  - `refactor/<scope>-<short-desc>`
+  - `test/<short-desc>`
+  - `perf/<short-desc>`
+  - `build/<short-desc>`
+  - `release/vX.Y.Z`
+  - `hotfix/<short-desc>`
+
+Examples:
+
+```text
+feature/reactivity-computed
+fix/vdom-keyed-order-123
+docs/contributing-guidelines
+ci/add-basic-workflow
+build/update-black
+refactor/component-state-split
+test/component-lifecycle
+release/v0.0.2
+hotfix/dom-event-delegation
+```
