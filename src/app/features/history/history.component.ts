@@ -21,6 +21,11 @@ import {
 
 type ViewMode = 'list' | 'calendar' | 'year';
 
+export interface SlotStatus {
+  name: string;
+  done: boolean;
+}
+
 export interface HistoryItem {
   date: string;
   displayDate: string;
@@ -31,6 +36,7 @@ export interface HistoryItem {
   note?: string;
   isMonthHeader: boolean;
   isExpanded?: boolean;
+  slots?: SlotStatus[];
 }
 
 export interface CalendarDay {
@@ -109,8 +115,12 @@ export class HistoryComponent {
 
   private calendarData = computed(() => {
     const checkIns = this.checkinService.checkIns();
-    const checkInMap = new Map<string, CheckIn>();
-    for (const c of checkIns) checkInMap.set(c.date, c);
+    const checkInMap = new Map<string, CheckIn[]>();
+    for (const c of checkIns) {
+      const list = checkInMap.get(c.date) ?? [];
+      list.push(c);
+      checkInMap.set(c.date, list);
+    }
     return {
       checkInMap,
       shieldedSet: new Set(this.checkinService.shieldedDates()),
@@ -123,10 +133,14 @@ export class HistoryComponent {
     const checkIns = this.checkinService.checkIns();
     const query = this.searchQuery().toLowerCase().trim();
     const expanded = this.expandedDates();
+    const slotsOn = this.checkinService.slotsEnabled();
+    const configuredSlots = this.checkinService.prayerSlots();
 
-    const checkInMap = new Map<string, CheckIn>();
+    const checkInMap = new Map<string, CheckIn[]>();
     for (const c of checkIns) {
-      checkInMap.set(c.date, c);
+      const list = checkInMap.get(c.date) ?? [];
+      list.push(c);
+      checkInMap.set(c.date, list);
     }
 
     const shieldedSet = new Set(this.checkinService.shieldedDates());
@@ -138,9 +152,10 @@ export class HistoryComponent {
 
     for (let i = 0; i < 30; i++) {
       const date = addDays(today, -i);
-      const checkIn = checkInMap.get(date);
+      const dayCheckIns = checkInMap.get(date);
+      const note = dayCheckIns?.find((c) => c.note)?.note;
 
-      if (query && !(checkIn?.note?.toLowerCase().includes(query))) {
+      if (query && !(note?.toLowerCase().includes(query))) {
         continue;
       }
 
@@ -157,18 +172,34 @@ export class HistoryComponent {
         lastMonth = monthYear;
       }
 
+      const hasCheckIns = !!dayCheckIns && dayCheckIns.length > 0;
+      const prayerTypes = dayCheckIns
+        ?.filter((c) => c.prayerType)
+        .map((c) => prayerTypeLabel(c.prayerType!)) ?? [];
+      const uniqueTypes = [...new Set(prayerTypes)];
+
+      let slots: SlotStatus[] | undefined;
+      if (slotsOn && configuredSlots.length > 0 && hasCheckIns) {
+        const completedSlotIds = new Set(
+          dayCheckIns.filter((c) => c.slot).map((c) => c.slot!)
+        );
+        slots = configuredSlots.map((s) => ({
+          name: s.name,
+          done: completedSlotIds.has(s.id),
+        }));
+      }
+
       items.push({
         date,
         displayDate: formatDisplayDate(date),
         monthYear,
-        checked: !!checkIn,
-        shielded: !checkIn && shieldsOn && shieldedSet.has(date),
-        prayerType: checkIn?.prayerType
-          ? prayerTypeLabel(checkIn.prayerType)
-          : undefined,
-        note: checkIn?.note,
+        checked: hasCheckIns,
+        shielded: !hasCheckIns && shieldsOn && shieldedSet.has(date),
+        prayerType: uniqueTypes.length > 0 ? uniqueTypes.join(', ') : undefined,
+        note,
         isMonthHeader: false,
         isExpanded: expanded.has(date),
+        slots,
       });
     }
 
@@ -322,7 +353,7 @@ export class HistoryComponent {
   private buildWeeksForMonth(
     year: number,
     month: number,
-    checkInMap: Map<string, CheckIn>,
+    checkInMap: Map<string, CheckIn[]>,
     shieldedSet: Set<string>,
     shieldsOn: boolean,
     today: string,
@@ -330,31 +361,29 @@ export class HistoryComponent {
     const startDayOfWeek = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
+    const dayForDate = (dateStr: string, dayOfMonth: number, isCurrent: boolean): CalendarDay => {
+      const cis = checkInMap.get(dateStr);
+      const hasCheckins = !!cis && cis.length > 0;
+      return {
+        date: dateStr, dayOfMonth, isCurrentMonth: isCurrent,
+        checked: hasCheckins,
+        hasNote: !!cis?.some((c) => c.note),
+        shielded: !hasCheckins && shieldsOn && shieldedSet.has(dateStr),
+        isToday: dateStr === today,
+      };
+    };
+
     const weeks: CalendarDay[][] = [];
     let week: CalendarDay[] = [];
 
     const prevDays = new Date(year, month, 0).getDate();
     for (let i = startDayOfWeek - 1; i >= 0; i--) {
       const day = prevDays - i;
-      const dateStr = formatDateISO(new Date(year, month - 1, day));
-      const ci = checkInMap.get(dateStr);
-      week.push({
-        date: dateStr, dayOfMonth: day, isCurrentMonth: false,
-        checked: !!ci, hasNote: !!ci?.note,
-        shielded: !ci && shieldsOn && shieldedSet.has(dateStr),
-        isToday: dateStr === today,
-      });
+      week.push(dayForDate(formatDateISO(new Date(year, month - 1, day)), day, false));
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
-      const dateStr = formatDateISO(new Date(year, month, day));
-      const ci = checkInMap.get(dateStr);
-      week.push({
-        date: dateStr, dayOfMonth: day, isCurrentMonth: true,
-        checked: !!ci, hasNote: !!ci?.note,
-        shielded: !ci && shieldsOn && shieldedSet.has(dateStr),
-        isToday: dateStr === today,
-      });
+      week.push(dayForDate(formatDateISO(new Date(year, month, day)), day, true));
       if (week.length === 7) {
         weeks.push(week);
         week = [];
@@ -364,14 +393,7 @@ export class HistoryComponent {
     if (week.length > 0) {
       let nextDay = 1;
       while (week.length < 7) {
-        const dateStr = formatDateISO(new Date(year, month + 1, nextDay));
-        const ci = checkInMap.get(dateStr);
-        week.push({
-          date: dateStr, dayOfMonth: nextDay, isCurrentMonth: false,
-          checked: !!ci, hasNote: !!ci?.note,
-          shielded: !ci && shieldsOn && shieldedSet.has(dateStr),
-          isToday: dateStr === today,
-        });
+        week.push(dayForDate(formatDateISO(new Date(year, month + 1, nextDay)), nextDay, false));
         nextDay++;
       }
       weeks.push(week);

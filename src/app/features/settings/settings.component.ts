@@ -10,7 +10,11 @@ import { CheckInService } from '../../core/services/checkin.service';
 import { MilestoneService } from '../../core/services/milestone.service';
 import { ReminderService } from '../../core/services/reminder.service';
 import { ReviewService } from '../../core/services/review.service';
-import { PrayerType, prayerTypeLabel } from '../../core/models/checkin.model';
+import {
+  PrayerType,
+  SlotStreakRequirement,
+  prayerTypeLabel,
+} from '../../core/models/checkin.model';
 
 @Component({
   selector: 'ns-settings',
@@ -30,10 +34,10 @@ export class SettingsComponent {
 
   cancelIcon = String.fromCharCode(0xe5c9);
   addIcon = String.fromCharCode(0xe145);
-  shieldIcon = String.fromCharCode(0xe8e8); // verified_user
-  starIcon = String.fromCharCode(0xe838);   // star
-  lockIcon = String.fromCharCode(0xe897);   // lock
-  checkSmallIcon = String.fromCharCode(0xe5ca); // check
+  shieldIcon = String.fromCharCode(0xe8e8);
+  starIcon = String.fromCharCode(0xe838);
+  lockIcon = String.fromCharCode(0xe897);
+  checkSmallIcon = String.fromCharCode(0xe5ca);
 
   private updatingReminder = false;
   private timeChangeTimeout: ReturnType<typeof setTimeout> | undefined;
@@ -74,6 +78,28 @@ export class SettingsComponent {
 
   onShieldToggle(args: any): void {
     this.checkinService.setShieldsEnabled(args.value);
+  }
+
+  onSlotsToggle(args: any): void {
+    this.checkinService.setSlotsEnabled(args.value);
+  }
+
+  onStreakRequirementChange(req: SlotStreakRequirement): void {
+    this.checkinService.setSlotStreakRequirement(req);
+  }
+
+  async addSlot(): Promise<void> {
+    const result = await Dialogs.prompt({
+      title: 'Add Prayer Slot',
+      message: 'Enter a name for the new slot (e.g. "Night"):',
+      okButtonText: 'Add',
+      cancelButtonText: 'Cancel',
+      defaultText: '',
+    });
+
+    if (result.result && result.text?.trim()) {
+      this.checkinService.addSlot(result.text);
+    }
   }
 
   async addCustomType(): Promise<void> {

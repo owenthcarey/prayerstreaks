@@ -15,7 +15,11 @@ import { MilestoneService } from '../../core/services/milestone.service';
 import { ReminderService } from '../../core/services/reminder.service';
 import { ReviewService } from '../../core/services/review.service';
 import { ShareService } from '../../core/services/share.service';
-import { PrayerType, prayerTypeLabel } from '../../core/models/checkin.model';
+import {
+  PrayerType,
+  PrayerSlot,
+  prayerTypeLabel,
+} from '../../core/models/checkin.model';
 import { MILESTONES } from '../../core/models/milestone.model';
 import { formatDateISO, getTodayISO } from '../../core/utils/date.utils';
 import {
@@ -74,6 +78,30 @@ export class TodayComponent {
   }
 
   journalCharCount = computed(() => this.journalNote().length);
+
+  slotStatuses = computed(() => {
+    const slots = this.checkinService.prayerSlots();
+    const completed = new Set(this.checkinService.todayCompletedSlots());
+    const today = getTodayISO();
+    const todayCheckIns = this.checkinService
+      .checkIns()
+      .filter((c) => c.date === today);
+
+    return slots.map((s) => {
+      const checkIn = todayCheckIns.find((c) => c.slot === s.id);
+      return {
+        ...s,
+        done: completed.has(s.id),
+        prayerType: checkIn?.prayerType,
+      };
+    });
+  });
+
+  progressText = computed(() => {
+    const p = this.checkinService.todayProgress();
+    if (!p) return '';
+    return `${p.done} of ${p.total} prayers completed`;
+  });
 
   // --- Share panel state ---
 
@@ -209,14 +237,25 @@ export class TodayComponent {
 
   onCheckIn(): void {
     this.checkinService.checkIn(this.selectedType());
+    this.postCheckIn();
+  }
+
+  onSlotCheckIn(slot: PrayerSlot): void {
+    this.checkinService.checkIn(this.selectedType(), slot.id);
+    this.postCheckIn();
+  }
+
+  private postCheckIn(): void {
     const milestone = this.milestoneService.checkForNewMilestones();
     this.reminderService.rescheduleIfEnabled();
     this.reviewService.evaluateReviewPrompt(
       this.checkinService.currentStreak(),
       milestone !== null
     );
-    this.journalNote.set('');
-    this.journalSaved.set(false);
+    if (!this.checkinService.checkedInToday()) {
+      this.journalNote.set('');
+      this.journalSaved.set(false);
+    }
   }
 
   onJournalInput(text: string): void {

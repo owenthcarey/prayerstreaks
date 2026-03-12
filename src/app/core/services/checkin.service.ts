@@ -2,7 +2,10 @@ import { Injectable, computed, inject, signal } from '@angular/core';
 import {
   CheckIn,
   PrayerType,
+  PrayerSlot,
+  SlotStreakRequirement,
   DEFAULT_PRAYER_TYPES,
+  DEFAULT_PRAYER_SLOTS,
 } from '../models/checkin.model';
 import { StorageService } from './storage.service';
 import {
@@ -17,6 +20,9 @@ const PRAYER_TYPES_KEY = 'prayerTypes';
 const SHIELD_COUNT_KEY = 'shieldCount';
 const SHIELDED_DATES_KEY = 'shieldedDates';
 const SHIELDS_ENABLED_KEY = 'shieldsEnabled';
+const SLOTS_KEY = 'prayerSlots';
+const SLOTS_ENABLED_KEY = 'slotsEnabled';
+const SLOT_STREAK_REQ_KEY = 'slotStreakRequirement';
 const MAX_SHIELDS = 3;
 const SHIELD_EARN_INTERVAL = 7;
 
@@ -36,14 +42,48 @@ export class CheckInService {
     this.storage.getBoolean(SHIELDS_ENABLED_KEY, true)
   );
 
+  prayerSlots = signal<PrayerSlot[]>(this.loadSlots());
+  slotsEnabled = signal<boolean>(
+    this.storage.getBoolean(SLOTS_ENABLED_KEY, false)
+  );
+  slotStreakRequirement = signal<SlotStreakRequirement>(
+    this.storage.getJSON<SlotStreakRequirement>(SLOT_STREAK_REQ_KEY, 'any')
+  );
+
   /**
    * Merged set of check-in dates + shielded dates for streak calculation.
-   * When shields are disabled, shielded dates are excluded.
+   * When "require all" slot mode is active, only dates with every
+   * configured slot checked are counted.
    */
   private allStreakDates = computed(() => {
-    const checkInDates = this.checkIns().map((c) => c.date);
+    const checkIns = this.checkIns();
     const shielded = this.shieldsEnabled() ? this.shieldedDates() : [];
-    return [...new Set([...checkInDates, ...shielded])];
+
+    let qualifiedDates: string[];
+
+    if (
+      this.slotsEnabled() &&
+      this.slotStreakRequirement() === 'all' &&
+      this.prayerSlots().length > 0
+    ) {
+      const slotIds = new Set(this.prayerSlots().map((s) => s.id));
+      const dateSlots = new Map<string, Set<string>>();
+      for (const c of checkIns) {
+        if (!dateSlots.has(c.date)) dateSlots.set(c.date, new Set());
+        if (c.slot) dateSlots.get(c.date)!.add(c.slot);
+      }
+
+      const uniqueDates = [...new Set(checkIns.map((c) => c.date))];
+      qualifiedDates = uniqueDates.filter((date) => {
+        if (checkIns.some((c) => c.date === date && !c.slot)) return true;
+        const completed = dateSlots.get(date);
+        return !!completed && [...slotIds].every((id) => completed.has(id));
+      });
+    } else {
+      qualifiedDates = [...new Set(checkIns.map((c) => c.date))];
+    }
+
+    return [...new Set([...qualifiedDates, ...shielded])];
   });
 
   checkedInToday = computed(() => {
@@ -51,9 +91,33 @@ export class CheckInService {
     return this.checkIns().some((c) => c.date === today);
   });
 
+  /** Which slot ids have been checked in today. */
+  todayCompletedSlots = computed(() => {
+    const today = getTodayISO();
+    return this.checkIns()
+      .filter((c) => c.date === today && c.slot)
+      .map((c) => c.slot!);
+  });
+
+  todaySlotsComplete = computed(() => {
+    if (!this.slotsEnabled()) return this.checkedInToday();
+    const slots = this.prayerSlots();
+    if (slots.length === 0) return this.checkedInToday();
+    const completed = new Set(this.todayCompletedSlots());
+    return slots.every((s) => completed.has(s.id));
+  });
+
+  todayProgress = computed(() => {
+    if (!this.slotsEnabled()) return null;
+    const slots = this.prayerSlots();
+    if (slots.length === 0) return null;
+    const done = this.todayCompletedSlots().length;
+    return { done, total: slots.length };
+  });
+
   todayNote = computed(() => {
     const today = getTodayISO();
-    return this.checkIns().find((c) => c.date === today)?.note ?? '';
+    return this.checkIns().find((c) => c.date === today && c.note)?.note ?? '';
   });
 
   currentStreak = computed(() => {
@@ -72,15 +136,21 @@ export class CheckInService {
     this.autoApplyShields();
   }
 
-  checkIn(prayerType?: PrayerType): void {
+  checkIn(prayerType?: PrayerType, slot?: string): void {
     const today = getTodayISO();
     const existing = this.checkIns();
-    if (existing.some((c) => c.date === today)) return;
+
+    if (slot) {
+      if (existing.some((c) => c.date === today && c.slot === slot)) return;
+    } else {
+      if (existing.some((c) => c.date === today && !c.slot)) return;
+    }
 
     const newCheckIn: CheckIn = {
       date: today,
       checkedInAt: Date.now(),
       ...(prayerType ? { prayerType } : {}),
+      ...(slot ? { slot } : {}),
     };
 
     const updated = [newCheckIn, ...existing];
@@ -98,9 +168,16 @@ export class CheckInService {
 
   updateNote(date: string, note: string): void {
     const trimmed = note.slice(0, 500);
-    const updated = this.checkIns().map((c) =>
-      c.date === date ? { ...c, note: trimmed || undefined } : c
-    );
+    const all = this.checkIns();
+    const first = all.find((c) => c.date === date);
+    if (!first) return;
+
+    const updated = all.map((c) => {
+      if (c.date !== date) return c;
+      if (c === first) return { ...c, note: trimmed || undefined };
+      const { note: _n, ...rest } = c;
+      return rest;
+    });
     this.checkIns.set(updated);
     this.saveCheckIns(updated);
   }
@@ -114,17 +191,36 @@ export class CheckInService {
   }
 
   exportJournalText(): string {
-    const entries = [...this.checkIns()]
-      .filter((c) => c.note)
-      .sort((a, b) => (a.date > b.date ? -1 : 1));
+    const all = [...this.checkIns()].sort((a, b) =>
+      a.date > b.date ? -1 : 1
+    );
+
+    const seen = new Set<string>();
+    const entries: { date: string; types: string[]; note: string }[] = [];
+
+    for (const c of all) {
+      if (!seen.has(c.date)) {
+        seen.add(c.date);
+        const dayCheckIns = all.filter((ci) => ci.date === c.date);
+        const note = dayCheckIns.find((ci) => ci.note)?.note;
+        if (note) {
+          const types = dayCheckIns
+            .filter((ci) => ci.prayerType)
+            .map(
+              (ci) =>
+                ci.prayerType!.charAt(0).toUpperCase() +
+                ci.prayerType!.slice(1)
+            );
+          entries.push({ date: c.date, types, note });
+        }
+      }
+    }
 
     if (entries.length === 0) return '';
 
-    const lines = entries.map((c) => {
-      const typeLabel = c.prayerType
-        ? ` (${c.prayerType.charAt(0).toUpperCase() + c.prayerType.slice(1)})`
-        : '';
-      return `${c.date}${typeLabel}\n${c.note}\n`;
+    const lines = entries.map((e) => {
+      const typeLabel = e.types.length ? ` (${e.types.join(', ')})` : '';
+      return `${e.date}${typeLabel}\n${e.note}\n`;
     });
 
     return `Prayer Journal\n${'='.repeat(40)}\n\n${lines.join('\n')}`;
@@ -145,6 +241,31 @@ export class CheckInService {
     this.savePrayerTypes(updated);
   }
 
+  setSlotsEnabled(enabled: boolean): void {
+    this.slotsEnabled.set(enabled);
+    this.storage.setBoolean(SLOTS_ENABLED_KEY, enabled);
+  }
+
+  setSlotStreakRequirement(req: SlotStreakRequirement): void {
+    this.slotStreakRequirement.set(req);
+    this.storage.setJSON(SLOT_STREAK_REQ_KEY, req);
+  }
+
+  addSlot(name: string): void {
+    const id = name.trim().toLowerCase().replace(/\s+/g, '-');
+    const current = this.prayerSlots();
+    if (current.some((s) => s.id === id)) return;
+    const updated = [...current, { id, name: name.trim() }];
+    this.prayerSlots.set(updated);
+    this.saveSlots(updated);
+  }
+
+  removeSlot(id: string): void {
+    const updated = this.prayerSlots().filter((s) => s.id !== id);
+    this.prayerSlots.set(updated);
+    this.saveSlots(updated);
+  }
+
   setShieldsEnabled(enabled: boolean): void {
     this.shieldsEnabled.set(enabled);
     this.storage.setBoolean(SHIELDS_ENABLED_KEY, enabled);
@@ -160,6 +281,9 @@ export class CheckInService {
     this.shieldCount.set(0);
     this.shieldedDates.set([]);
     this.shieldsEnabled.set(true);
+    this.prayerSlots.set([...DEFAULT_PRAYER_SLOTS]);
+    this.slotsEnabled.set(false);
+    this.slotStreakRequirement.set('any');
   }
 
   /**
@@ -231,6 +355,16 @@ export class CheckInService {
 
   private savePrayerTypes(types: PrayerType[]): void {
     this.storage.setJSON(PRAYER_TYPES_KEY, types);
+  }
+
+  private loadSlots(): PrayerSlot[] {
+    return this.storage.getJSON<PrayerSlot[]>(SLOTS_KEY, [
+      ...DEFAULT_PRAYER_SLOTS,
+    ]);
+  }
+
+  private saveSlots(slots: PrayerSlot[]): void {
+    this.storage.setJSON(SLOTS_KEY, slots);
   }
 }
 

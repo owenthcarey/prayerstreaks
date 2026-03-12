@@ -172,6 +172,18 @@
                 ></Label>
               </StackLayout>
             </GridLayout>
+            <!-- Slot badges -->
+            <WrapLayout *ngIf="item.slots && item.slots.length > 0" class="px-4 pt-1 pb-2 ml-8">
+              <Label *ngFor="let sl of item.slots"
+                [text]="sl.name"
+                [class]="
+                  'mr-1 mb-1 py-1 px-2 rounded text-xs font-medium ' +
+                  (sl.done
+                    ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-400 dark:text-gray-500')
+                "
+              ></Label>
+            </WrapLayout>
             <StackLayout *ngIf="item.isExpanded && item.note" class="px-4 pb-3 pt-1 ml-8">
               <Label
                 [text]="item.note"

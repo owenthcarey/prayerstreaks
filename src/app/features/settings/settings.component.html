@@ -108,6 +108,125 @@
       }
     </StackLayout>
 
+    <!-- Prayer Slots Section -->
+    <Label
+      text="Prayer Slots"
+      class="text-2xl font-bold mb-4 dark:text-white"
+    ></Label>
+    <StackLayout class="rounded-2xl bg-white dark:bg-[#1c1c1e] px-4 py-3 mb-6">
+      <GridLayout columns="*, auto" class="py-2 px-1">
+        <Label
+          col="0"
+          text="Multiple Daily Prayers"
+          class="text-base text-gray-800 dark:text-gray-200"
+          verticalAlignment="center"
+        ></Label>
+        <Switch
+          col="1"
+          [checked]="checkinService.slotsEnabled()"
+          (checkedChange)="onSlotsToggle($event)"
+        ></Switch>
+      </GridLayout>
+      <Label
+        text="Track multiple prayer times each day — morning, midday, evening, or custom."
+        class="text-sm text-gray-500 dark:text-gray-400 px-1 pb-2"
+        textWrap="true"
+      ></Label>
+      @if (checkinService.slotsEnabled()) {
+        <StackLayout class="border-t border-gray-100 dark:border-gray-700 pt-3">
+          @for (slot of checkinService.prayerSlots(); track slot.id) {
+            <GridLayout columns="*, auto" class="py-2 px-1 border-b border-gray-100 dark:border-gray-700">
+              <Label
+                col="0"
+                [text]="slot.name"
+                class="text-base text-gray-800 dark:text-gray-200"
+              ></Label>
+              <!-- iOS: SFSymbol -->
+              <Image
+                *ngIf="isIOS"
+                col="1"
+                src="sys://xmark.circle.fill"
+                tintColor="#ef4444"
+                width="20" height="20"
+                class="px-3 py-1"
+                (tap)="checkinService.removeSlot(slot.id)"
+              ></Image>
+              <!-- Android: Material Icon -->
+              <Label
+                *ngIf="!isIOS"
+                col="1"
+                [text]="cancelIcon"
+                class="material-icon text-red-500 px-3 py-1"
+                style="font-size: 20"
+                (tap)="checkinService.removeSlot(slot.id)"
+              ></Label>
+            </GridLayout>
+          }
+          <GridLayout
+            columns="auto, *"
+            (tap)="addSlot()"
+            class="mt-3 bg-blue-50 dark:bg-blue-900 rounded-xl p-3"
+          >
+            <!-- iOS: SFSymbol -->
+            <Image
+              *ngIf="isIOS"
+              col="0"
+              src="sys://plus.circle.fill"
+              tintColor="#2563eb"
+              width="20" height="20"
+              class="mr-2"
+            ></Image>
+            <!-- Android: Material Icon -->
+            <Label
+              *ngIf="!isIOS"
+              col="0"
+              [text]="addIcon"
+              class="material-icon text-blue-600 dark:text-blue-400 mr-2"
+              style="font-size: 20"
+            ></Label>
+            <Label
+              col="1"
+              text="Add slot..."
+              class="text-blue-600 dark:text-blue-400 text-base font-semibold"
+            ></Label>
+          </GridLayout>
+
+          <!-- Streak requirement toggle -->
+          <Label
+            text="Streak Completion"
+            class="text-sm font-semibold text-gray-500 dark:text-gray-400 mt-4 mb-2 px-1 uppercase"
+          ></Label>
+          <GridLayout columns="*, *" class="mb-2">
+            <Label col="0" text="Any slot"
+              [class]="
+                'text-center py-2 rounded-lg mr-1 text-sm font-medium border ' +
+                (checkinService.slotStreakRequirement() === 'any'
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-gray-50 dark:bg-[#2c2c2e] text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600')
+              "
+              (tap)="onStreakRequirementChange('any')"
+            ></Label>
+            <Label col="1" text="All slots"
+              [class]="
+                'text-center py-2 rounded-lg ml-1 text-sm font-medium border ' +
+                (checkinService.slotStreakRequirement() === 'all'
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-gray-50 dark:bg-[#2c2c2e] text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600')
+              "
+              (tap)="onStreakRequirementChange('all')"
+            ></Label>
+          </GridLayout>
+          <Label
+            [text]="checkinService.slotStreakRequirement() === 'any'
+              ? 'Your streak counts if you complete at least one slot per day.'
+              : 'Your streak counts only when you complete every slot each day.'"
+            class="text-xs text-gray-400 dark:text-gray-500 px-1 pb-1"
+            textWrap="true"
+          ></Label>
+        </StackLayout>
+      }
+    </StackLayout>
+
     <!-- Streak Shields Section -->
     <Label
       text="Streak Shields"

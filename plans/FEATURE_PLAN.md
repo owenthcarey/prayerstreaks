@@ -224,7 +224,7 @@ devotion over time.
 
 ---
 
-### 3.3 Multiple Daily Prayer Slots - [ ]
+### 3.3 Multiple Daily Prayer Slots - [x]
 
 **Why:** Many users pray multiple times per day (morning, evening, before meals).
 Supporting this makes the app useful for the most devout users and increases
