@@ -70,6 +70,21 @@ export class ReminderService {
     }
   }
 
+  // ---- Dev-only methods (never called in production — panel is hidden) ----
+
+  async devFireTestNotification(): Promise<void> {
+    const at = new Date();
+    at.setSeconds(at.getSeconds() + 3);
+    await LocalNotifications.schedule([
+      {
+        id: 999,
+        title: 'Prayer Streaks (Test)',
+        body: 'This is a test notification from the dev panel.',
+        at,
+      },
+    ]);
+  }
+
   private async schedule(): Promise<void> {
     await LocalNotifications.cancel(NOTIFICATION_ID);
 

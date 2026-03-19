@@ -1,0 +1,401 @@
+<StackLayout>
+  <Label
+    text="Developer Tools"
+    class="text-2xl font-bold mb-2 text-amber-600 dark:text-amber-400"
+  ></Label>
+
+  <StackLayout class="rounded-2xl bg-white dark:bg-[#1c1c1e] px-4 py-1 mb-6">
+
+    <!-- ================================================================== -->
+    <!-- Section 1: State Inspector                                         -->
+    <!-- ================================================================== -->
+    <GridLayout columns="*, auto" class="py-3" (tap)="toggleSection('inspector')">
+      <Label col="0" text="State Inspector" class="text-sm font-bold text-amber-600 dark:text-amber-400"></Label>
+      <Image *ngIf="isIOS" col="1" [src]="isExpanded('inspector') ? 'sys://chevron.up' : 'sys://chevron.down'" tintColor="#fbbf24" width="16" height="16"></Image>
+      <Label *ngIf="!isIOS" col="1" [text]="isExpanded('inspector') ? collapseIcon : expandIcon" class="material-icon text-amber-400" style="font-size: 20"></Label>
+    </GridLayout>
+    @if (isExpanded('inspector')) {
+      <StackLayout class="pb-3">
+        <GridLayout columns="*, auto" class="py-0.5">
+          <Label col="0" text="Current streak" class="text-xs text-gray-500 dark:text-gray-400"></Label>
+          <Label col="1" [text]="devTools.checkinService.currentStreak()" class="text-xs font-bold text-gray-800 dark:text-gray-200"></Label>
+        </GridLayout>
+        <GridLayout columns="*, auto" class="py-0.5">
+          <Label col="0" text="Longest streak" class="text-xs text-gray-500 dark:text-gray-400"></Label>
+          <Label col="1" [text]="devTools.checkinService.longestStreak()" class="text-xs font-bold text-gray-800 dark:text-gray-200"></Label>
+        </GridLayout>
+        <GridLayout columns="*, auto" class="py-0.5">
+          <Label col="0" text="Total check-ins" class="text-xs text-gray-500 dark:text-gray-400"></Label>
+          <Label col="1" [text]="devTools.checkinService.checkIns().length" class="text-xs font-bold text-gray-800 dark:text-gray-200"></Label>
+        </GridLayout>
+        <GridLayout columns="*, auto" class="py-0.5">
+          <Label col="0" text="Checked in today" class="text-xs text-gray-500 dark:text-gray-400"></Label>
+          <Label col="1" [text]="devTools.checkinService.checkedInToday() ? '✓' : '✗'" class="text-xs font-bold" [class.text-green-500]="devTools.checkinService.checkedInToday()" [class.text-red-400]="!devTools.checkinService.checkedInToday()"></Label>
+        </GridLayout>
+        <GridLayout columns="*, auto" class="py-0.5">
+          <Label col="0" text="Shields available" class="text-xs text-gray-500 dark:text-gray-400"></Label>
+          <Label col="1" [text]="devTools.checkinService.shieldCount()" class="text-xs font-bold text-gray-800 dark:text-gray-200"></Label>
+        </GridLayout>
+        <GridLayout columns="*, auto" class="py-0.5">
+          <Label col="0" text="Shielded dates" class="text-xs text-gray-500 dark:text-gray-400"></Label>
+          <Label col="1" [text]="devTools.checkinService.shieldedDates().length" class="text-xs font-bold text-gray-800 dark:text-gray-200"></Label>
+        </GridLayout>
+        <GridLayout columns="*, auto" class="py-0.5">
+          <Label col="0" text="Shields enabled" class="text-xs text-gray-500 dark:text-gray-400"></Label>
+          <Label col="1" [text]="devTools.checkinService.shieldsEnabled() ? '✓' : '✗'" class="text-xs font-bold" [class.text-green-500]="devTools.checkinService.shieldsEnabled()" [class.text-red-400]="!devTools.checkinService.shieldsEnabled()"></Label>
+        </GridLayout>
+        <GridLayout columns="*, auto" class="py-0.5">
+          <Label col="0" text="Slots enabled" class="text-xs text-gray-500 dark:text-gray-400"></Label>
+          <Label col="1" [text]="devTools.checkinService.slotsEnabled() ? '✓' : '✗'" class="text-xs font-bold" [class.text-green-500]="devTools.checkinService.slotsEnabled()" [class.text-red-400]="!devTools.checkinService.slotsEnabled()"></Label>
+        </GridLayout>
+        <GridLayout columns="*, auto" class="py-0.5">
+          <Label col="0" text="Slot streak req" class="text-xs text-gray-500 dark:text-gray-400"></Label>
+          <Label col="1" [text]="devTools.checkinService.slotStreakRequirement()" class="text-xs font-bold text-gray-800 dark:text-gray-200"></Label>
+        </GridLayout>
+        <GridLayout columns="*, auto" class="py-0.5">
+          <Label col="0" text="Milestones unlocked" class="text-xs text-gray-500 dark:text-gray-400"></Label>
+          <Label col="1" [text]="devTools.milestoneService.unlockedIds().length + '/8'" class="text-xs font-bold text-gray-800 dark:text-gray-200"></Label>
+        </GridLayout>
+        <GridLayout columns="*, auto" class="py-0.5">
+          <Label col="0" text="Pending celebration" class="text-xs text-gray-500 dark:text-gray-400"></Label>
+          <Label col="1" [text]="devTools.milestoneService.pendingCelebration()?.title ?? 'None'" class="text-xs font-bold text-gray-800 dark:text-gray-200"></Label>
+        </GridLayout>
+        <GridLayout columns="*, auto" class="py-0.5">
+          <Label col="0" text="Next milestone" class="text-xs text-gray-500 dark:text-gray-400"></Label>
+          <Label col="1" [text]="devTools.milestoneService.nextMilestone()?.title ?? 'All unlocked'" class="text-xs font-bold text-gray-800 dark:text-gray-200"></Label>
+        </GridLayout>
+        <GridLayout columns="*, auto" class="py-0.5">
+          <Label col="0" text="Review prompts" class="text-xs text-gray-500 dark:text-gray-400"></Label>
+          <Label col="1" [text]="reviewState().promptCount" class="text-xs font-bold text-gray-800 dark:text-gray-200"></Label>
+        </GridLayout>
+        <GridLayout columns="*, auto" class="py-0.5">
+          <Label col="0" text="Last review prompt" class="text-xs text-gray-500 dark:text-gray-400"></Label>
+          <Label col="1" [text]="reviewState().lastPromptDate || 'Never'" class="text-xs font-bold text-gray-800 dark:text-gray-200"></Label>
+        </GridLayout>
+        <GridLayout columns="*, auto" class="py-0.5">
+          <Label col="0" text="Session dates" class="text-xs text-gray-500 dark:text-gray-400"></Label>
+          <Label col="1" [text]="reviewState().sessionDates.length" class="text-xs font-bold text-gray-800 dark:text-gray-200"></Label>
+        </GridLayout>
+        <GridLayout columns="*, auto" class="py-0.5">
+          <Label col="0" text="First 7-day prompted" class="text-xs text-gray-500 dark:text-gray-400"></Label>
+          <Label col="1" [text]="reviewState().first7DayPrompted ? '✓' : '✗'" class="text-xs font-bold" [class.text-green-500]="reviewState().first7DayPrompted" [class.text-red-400]="!reviewState().first7DayPrompted"></Label>
+        </GridLayout>
+        <GridLayout columns="*, auto" class="py-0.5">
+          <Label col="0" text="Reminder enabled" class="text-xs text-gray-500 dark:text-gray-400"></Label>
+          <Label col="1" [text]="devTools.reminderService.enabled() ? '✓' : '✗'" class="text-xs font-bold" [class.text-green-500]="devTools.reminderService.enabled()" [class.text-red-400]="!devTools.reminderService.enabled()"></Label>
+        </GridLayout>
+        <GridLayout columns="*, auto" class="py-0.5">
+          <Label col="0" text="Reminder time" class="text-xs text-gray-500 dark:text-gray-400"></Label>
+          <Label col="1" [text]="devTools.reminderService.displayTime()" class="text-xs font-bold text-gray-800 dark:text-gray-200"></Label>
+        </GridLayout>
+        <GridLayout columns="*, auto" class="py-0.5">
+          <Label col="0" text="Date override" class="text-xs text-gray-500 dark:text-gray-400"></Label>
+          <Label col="1" [text]="dateOverride() ?? 'None'" class="text-xs font-bold" [class.text-amber-500]="dateOverride()" [class.text-gray-800]="!dateOverride()" [class.dark:text-gray-200]="!dateOverride()"></Label>
+        </GridLayout>
+      </StackLayout>
+    }
+
+    <StackLayout class="border-t border-gray-100 dark:border-gray-700"></StackLayout>
+
+    <!-- ================================================================== -->
+    <!-- Section 2: Data Seeding                                            -->
+    <!-- ================================================================== -->
+    <GridLayout columns="*, auto" class="py-3" (tap)="toggleSection('seeding')">
+      <Label col="0" text="Data Seeding" class="text-sm font-bold text-amber-600 dark:text-amber-400"></Label>
+      <Image *ngIf="isIOS" col="1" [src]="isExpanded('seeding') ? 'sys://chevron.up' : 'sys://chevron.down'" tintColor="#fbbf24" width="16" height="16"></Image>
+      <Label *ngIf="!isIOS" col="1" [text]="isExpanded('seeding') ? collapseIcon : expandIcon" class="material-icon text-amber-400" style="font-size: 20"></Label>
+    </GridLayout>
+    @if (isExpanded('seeding')) {
+      <StackLayout class="pb-3">
+        <Label text="Quick Presets" class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2"></Label>
+        <GridLayout columns="*, *, *" class="mb-1">
+          <Label col="0" text="New User" (tap)="applyPreset('new-user')" class="text-center py-2 rounded-lg text-xs font-medium mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="1" text="1 Week" (tap)="applyPreset('one-week')" class="text-center py-2 rounded-lg text-xs font-medium mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="2" text="1 Month" (tap)="applyPreset('one-month')" class="text-center py-2 rounded-lg text-xs font-medium mx-0.5 bg-amber-500 text-white"></Label>
+        </GridLayout>
+        <GridLayout columns="*, *, *" class="mb-3">
+          <Label col="0" text="3 Months" (tap)="applyPreset('three-months')" class="text-center py-2 rounded-lg text-xs font-medium mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="1" text="Power User" (tap)="applyPreset('power-user')" class="text-center py-2 rounded-lg text-xs font-medium mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="2" text="Gaps+Shields" (tap)="applyPreset('gaps-shields')" class="text-center py-2 rounded-lg text-xs font-medium mx-0.5 bg-amber-500 text-white"></Label>
+        </GridLayout>
+
+        <Label text="Custom Seed" class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-2"></Label>
+        <GridLayout columns="auto, *" class="mb-2">
+          <Label col="0" text="Days:" class="text-xs text-gray-600 dark:text-gray-300 mr-2" verticalAlignment="center"></Label>
+          <TextField col="1" keyboardType="number" [text]="customDays().toString()" (textChange)="onCustomDaysInput($event.value)" class="border border-gray-300 dark:border-gray-600 rounded-lg p-1 text-xs bg-gray-50 dark:bg-[#2c2c2e] text-gray-800 dark:text-gray-200"></TextField>
+        </GridLayout>
+        <Label text="Notes %" class="text-xs text-gray-600 dark:text-gray-300 mb-1"></Label>
+        <GridLayout columns="*, *, *, *, *" class="mb-2">
+          <Label col="0" text="0%" (tap)="customNotePercent.set(0)" [class]="'text-center py-1.5 rounded-md text-xs mx-0.5 ' + (customNotePercent() === 0 ? 'bg-amber-500 text-white font-bold' : 'bg-gray-100 dark:bg-[#2c2c2e] text-gray-500 dark:text-gray-400')"></Label>
+          <Label col="1" text="25%" (tap)="customNotePercent.set(25)" [class]="'text-center py-1.5 rounded-md text-xs mx-0.5 ' + (customNotePercent() === 25 ? 'bg-amber-500 text-white font-bold' : 'bg-gray-100 dark:bg-[#2c2c2e] text-gray-500 dark:text-gray-400')"></Label>
+          <Label col="2" text="50%" (tap)="customNotePercent.set(50)" [class]="'text-center py-1.5 rounded-md text-xs mx-0.5 ' + (customNotePercent() === 50 ? 'bg-amber-500 text-white font-bold' : 'bg-gray-100 dark:bg-[#2c2c2e] text-gray-500 dark:text-gray-400')"></Label>
+          <Label col="3" text="75%" (tap)="customNotePercent.set(75)" [class]="'text-center py-1.5 rounded-md text-xs mx-0.5 ' + (customNotePercent() === 75 ? 'bg-amber-500 text-white font-bold' : 'bg-gray-100 dark:bg-[#2c2c2e] text-gray-500 dark:text-gray-400')"></Label>
+          <Label col="4" text="100%" (tap)="customNotePercent.set(100)" [class]="'text-center py-1.5 rounded-md text-xs mx-0.5 ' + (customNotePercent() === 100 ? 'bg-amber-500 text-white font-bold' : 'bg-gray-100 dark:bg-[#2c2c2e] text-gray-500 dark:text-gray-400')"></Label>
+        </GridLayout>
+        <Label text="Types %" class="text-xs text-gray-600 dark:text-gray-300 mb-1"></Label>
+        <GridLayout columns="*, *, *, *, *" class="mb-3">
+          <Label col="0" text="0%" (tap)="customTypePercent.set(0)" [class]="'text-center py-1.5 rounded-md text-xs mx-0.5 ' + (customTypePercent() === 0 ? 'bg-amber-500 text-white font-bold' : 'bg-gray-100 dark:bg-[#2c2c2e] text-gray-500 dark:text-gray-400')"></Label>
+          <Label col="1" text="25%" (tap)="customTypePercent.set(25)" [class]="'text-center py-1.5 rounded-md text-xs mx-0.5 ' + (customTypePercent() === 25 ? 'bg-amber-500 text-white font-bold' : 'bg-gray-100 dark:bg-[#2c2c2e] text-gray-500 dark:text-gray-400')"></Label>
+          <Label col="2" text="50%" (tap)="customTypePercent.set(50)" [class]="'text-center py-1.5 rounded-md text-xs mx-0.5 ' + (customTypePercent() === 50 ? 'bg-amber-500 text-white font-bold' : 'bg-gray-100 dark:bg-[#2c2c2e] text-gray-500 dark:text-gray-400')"></Label>
+          <Label col="3" text="75%" (tap)="customTypePercent.set(75)" [class]="'text-center py-1.5 rounded-md text-xs mx-0.5 ' + (customTypePercent() === 75 ? 'bg-amber-500 text-white font-bold' : 'bg-gray-100 dark:bg-[#2c2c2e] text-gray-500 dark:text-gray-400')"></Label>
+          <Label col="4" text="100%" (tap)="customTypePercent.set(100)" [class]="'text-center py-1.5 rounded-md text-xs mx-0.5 ' + (customTypePercent() === 100 ? 'bg-amber-500 text-white font-bold' : 'bg-gray-100 dark:bg-[#2c2c2e] text-gray-500 dark:text-gray-400')"></Label>
+        </GridLayout>
+        <GridLayout columns="*, *">
+          <Label col="0" text="Seed Custom" (tap)="seedCustom()" class="text-center py-2 rounded-lg text-xs font-medium mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="1" text="Clear All Data" (tap)="devTools.clearCheckInData()" class="text-center py-2 rounded-lg text-xs font-medium mx-0.5 bg-red-500 text-white"></Label>
+        </GridLayout>
+      </StackLayout>
+    }
+
+    <StackLayout class="border-t border-gray-100 dark:border-gray-700"></StackLayout>
+
+    <!-- ================================================================== -->
+    <!-- Section 3: Milestones                                              -->
+    <!-- ================================================================== -->
+    <GridLayout columns="*, auto" class="py-3" (tap)="toggleSection('milestones')">
+      <Label col="0" text="Milestones" class="text-sm font-bold text-amber-600 dark:text-amber-400"></Label>
+      <Image *ngIf="isIOS" col="1" [src]="isExpanded('milestones') ? 'sys://chevron.up' : 'sys://chevron.down'" tintColor="#fbbf24" width="16" height="16"></Image>
+      <Label *ngIf="!isIOS" col="1" [text]="isExpanded('milestones') ? collapseIcon : expandIcon" class="material-icon text-amber-400" style="font-size: 20"></Label>
+    </GridLayout>
+    @if (isExpanded('milestones')) {
+      <StackLayout class="pb-3">
+        @for (m of milestones; track m.id) {
+          <GridLayout columns="auto, *, auto, auto" class="py-1.5">
+            <Label col="0" [text]="isMilestoneUnlocked(m.id) ? '★' : '🔒'" class="text-sm mr-2" verticalAlignment="center"></Label>
+            <Label col="1" [text]="m.title + ' (' + m.days + 'd)'" class="text-xs text-gray-700 dark:text-gray-300" verticalAlignment="center"></Label>
+            <Label col="2"
+              [text]="isMilestoneUnlocked(m.id) ? 'Lock' : 'Unlock'"
+              (tap)="toggleMilestone(m)"
+              [class]="'text-center py-1 px-2 rounded-md text-xs mx-0.5 ' + (isMilestoneUnlocked(m.id) ? 'bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300' : 'bg-amber-500 text-white')"
+            ></Label>
+            <Label col="3" text="Celebrate" (tap)="devTools.triggerCelebration(m)" class="text-center py-1 px-2 rounded-md text-xs mx-0.5 bg-purple-500 text-white"></Label>
+          </GridLayout>
+        }
+        <GridLayout columns="*, *" class="mt-2">
+          <Label col="0" text="Unlock All" (tap)="devTools.unlockAllMilestones()" class="text-center py-2 rounded-lg text-xs font-medium mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="1" text="Lock All" (tap)="devTools.lockAllMilestones()" class="text-center py-2 rounded-lg text-xs font-medium mx-0.5 bg-gray-200 dark:bg-gray-600 text-gray-600 dark:text-gray-300"></Label>
+        </GridLayout>
+      </StackLayout>
+    }
+
+    <StackLayout class="border-t border-gray-100 dark:border-gray-700"></StackLayout>
+
+    <!-- ================================================================== -->
+    <!-- Section 4: Review Prompt                                           -->
+    <!-- ================================================================== -->
+    <GridLayout columns="*, auto" class="py-3" (tap)="toggleSection('review')">
+      <Label col="0" text="Review Prompt" class="text-sm font-bold text-amber-600 dark:text-amber-400"></Label>
+      <Image *ngIf="isIOS" col="1" [src]="isExpanded('review') ? 'sys://chevron.up' : 'sys://chevron.down'" tintColor="#fbbf24" width="16" height="16"></Image>
+      <Label *ngIf="!isIOS" col="1" [text]="isExpanded('review') ? collapseIcon : expandIcon" class="material-icon text-amber-400" style="font-size: 20"></Label>
+    </GridLayout>
+    @if (isExpanded('review')) {
+      <StackLayout class="pb-3">
+        <Label text="Sessions" class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1"></Label>
+        <GridLayout columns="*, *, *, *" class="mb-2">
+          <Label col="0" text="0" (tap)="devTools.setReviewSessionCount(0)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="1" text="2" (tap)="devTools.setReviewSessionCount(2)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="2" text="3" (tap)="devTools.setReviewSessionCount(3)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="3" text="5" (tap)="devTools.setReviewSessionCount(5)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+        </GridLayout>
+        <Label text="Last Prompt" class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1"></Label>
+        <GridLayout columns="*, *, *" class="mb-2">
+          <Label col="0" text="Never" (tap)="devTools.setReviewLastPrompt('never')" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="1" text="Today" (tap)="devTools.setReviewLastPrompt('today')" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="2" text="90d ago" (tap)="devTools.setReviewLastPrompt('90-days-ago')" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+        </GridLayout>
+        <Label text="Prompt Count" class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1"></Label>
+        <GridLayout columns="*, *, *, *" class="mb-2">
+          <Label col="0" text="0" (tap)="devTools.setReviewPromptCount(0)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="1" text="1" (tap)="devTools.setReviewPromptCount(1)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="2" text="2" (tap)="devTools.setReviewPromptCount(2)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="3" text="3" (tap)="devTools.setReviewPromptCount(3)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+        </GridLayout>
+        <GridLayout columns="*, *" class="mb-2">
+          <Label col="0"
+            [text]="'First 7d Flag: ' + (reviewState().first7DayPrompted ? 'ON' : 'OFF')"
+            (tap)="toggleFirst7Day()"
+            class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300"
+          ></Label>
+          <Label col="1" text="Force Prompt" (tap)="devTools.forceReviewPrompt()" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-red-500 text-white font-medium"></Label>
+        </GridLayout>
+      </StackLayout>
+    }
+
+    <StackLayout class="border-t border-gray-100 dark:border-gray-700"></StackLayout>
+
+    <!-- ================================================================== -->
+    <!-- Section 5: Shields                                                 -->
+    <!-- ================================================================== -->
+    <GridLayout columns="*, auto" class="py-3" (tap)="toggleSection('shields')">
+      <Label col="0" text="Shields" class="text-sm font-bold text-amber-600 dark:text-amber-400"></Label>
+      <Image *ngIf="isIOS" col="1" [src]="isExpanded('shields') ? 'sys://chevron.up' : 'sys://chevron.down'" tintColor="#fbbf24" width="16" height="16"></Image>
+      <Label *ngIf="!isIOS" col="1" [text]="isExpanded('shields') ? collapseIcon : expandIcon" class="material-icon text-amber-400" style="font-size: 20"></Label>
+    </GridLayout>
+    @if (isExpanded('shields')) {
+      <StackLayout class="pb-3">
+        <Label text="Set Shield Count" class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1"></Label>
+        <GridLayout columns="*, *, *, *" class="mb-2">
+          <Label col="0" text="0" (tap)="devTools.setShieldCount(0)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="1" text="1" (tap)="devTools.setShieldCount(1)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="2" text="2" (tap)="devTools.setShieldCount(2)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="3" text="3" (tap)="devTools.setShieldCount(3)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+        </GridLayout>
+        <Label text="Create Gap (remove check-in)" class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1"></Label>
+        <GridLayout columns="*, *, *" class="mb-2">
+          <Label col="0" text="Yesterday" (tap)="devTools.createGap(1)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="1" text="2d ago" (tap)="devTools.createGap(2)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="2" text="3d ago" (tap)="devTools.createGap(3)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+        </GridLayout>
+        <GridLayout columns="*, *">
+          <Label col="0" text="Auto-Apply" (tap)="devTools.triggerAutoApplyShields()" class="text-center py-2 rounded-lg text-xs font-medium mx-0.5 bg-purple-500 text-white"></Label>
+          <Label col="1" text="Shield Yesterday" (tap)="devTools.addShieldedDateYesterday()" class="text-center py-2 rounded-lg text-xs font-medium mx-0.5 bg-purple-500 text-white"></Label>
+        </GridLayout>
+      </StackLayout>
+    }
+
+    <StackLayout class="border-t border-gray-100 dark:border-gray-700"></StackLayout>
+
+    <!-- ================================================================== -->
+    <!-- Section 6: Share Cards                                             -->
+    <!-- ================================================================== -->
+    <GridLayout columns="*, auto" class="py-3" (tap)="toggleSection('share')">
+      <Label col="0" text="Share Card Preview" class="text-sm font-bold text-amber-600 dark:text-amber-400"></Label>
+      <Image *ngIf="isIOS" col="1" [src]="isExpanded('share') ? 'sys://chevron.up' : 'sys://chevron.down'" tintColor="#fbbf24" width="16" height="16"></Image>
+      <Label *ngIf="!isIOS" col="1" [text]="isExpanded('share') ? collapseIcon : expandIcon" class="material-icon text-amber-400" style="font-size: 20"></Label>
+    </GridLayout>
+    @if (isExpanded('share')) {
+      <StackLayout class="pb-3">
+        <Label text="Daily Card" class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1"></Label>
+        <GridLayout columns="*, *, *" class="mb-2">
+          <Label col="0" text="Day 1" (tap)="devTools.previewDailyCard(1)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="1" text="Day 100" (tap)="devTools.previewDailyCard(100)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="2" text="Day 365" (tap)="devTools.previewDailyCard(365)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+        </GridLayout>
+        <GridLayout columns="*, *, *">
+          <Label col="0" text="Milestone" (tap)="devTools.previewMilestoneCard(milestoneForSharePreview())" class="text-center py-2 rounded-lg text-xs font-medium mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="1" text="Weekly" (tap)="devTools.previewWeeklyCard()" class="text-center py-2 rounded-lg text-xs font-medium mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="2" text="Monthly" (tap)="devTools.previewMonthlyCard()" class="text-center py-2 rounded-lg text-xs font-medium mx-0.5 bg-amber-500 text-white"></Label>
+        </GridLayout>
+      </StackLayout>
+    }
+
+    <StackLayout class="border-t border-gray-100 dark:border-gray-700"></StackLayout>
+
+    <!-- ================================================================== -->
+    <!-- Section 7: Date Override                                           -->
+    <!-- ================================================================== -->
+    <GridLayout columns="*, auto" class="py-3" (tap)="toggleSection('date')">
+      <Label col="0" text="Date Override" class="text-sm font-bold text-amber-600 dark:text-amber-400"></Label>
+      <Image *ngIf="isIOS" col="1" [src]="isExpanded('date') ? 'sys://chevron.up' : 'sys://chevron.down'" tintColor="#fbbf24" width="16" height="16"></Image>
+      <Label *ngIf="!isIOS" col="1" [text]="isExpanded('date') ? collapseIcon : expandIcon" class="material-icon text-amber-400" style="font-size: 20"></Label>
+    </GridLayout>
+    @if (isExpanded('date')) {
+      <StackLayout class="pb-3">
+        <GridLayout columns="*, auto" class="mb-2 py-1">
+          <Label col="0" text="Current override:" class="text-xs text-gray-500 dark:text-gray-400"></Label>
+          <Label col="1" [text]="dateOverride() ?? 'None (real date)'" class="text-xs font-bold" [class.text-amber-500]="dateOverride()" [class.text-gray-800]="!dateOverride()" [class.dark:text-gray-200]="!dateOverride()"></Label>
+        </GridLayout>
+        <Label text="Offset from today" class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1"></Label>
+        <GridLayout columns="*, *, *" class="mb-2">
+          <Label col="0" text="+1 day" (tap)="devTools.setDateOffsetDays(1)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="1" text="+7 days" (tap)="devTools.setDateOffsetDays(7)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="2" text="+30 days" (tap)="devTools.setDateOffsetDays(30)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+        </GridLayout>
+        <Label text="Specific dates" class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1"></Label>
+        <GridLayout columns="*, *, *, *">
+          <Label col="0" text="Dec 31" (tap)="devTools.setDateToDecember31()" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="1" text="Jan 1" (tap)="devTools.setDateToJanuary1()" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="2" text="Feb 29" (tap)="devTools.setDateToLeapDay()" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="3" text="Reset" (tap)="devTools.clearDateOverride()" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-red-500 text-white font-medium"></Label>
+        </GridLayout>
+      </StackLayout>
+    }
+
+    <StackLayout class="border-t border-gray-100 dark:border-gray-700"></StackLayout>
+
+    <!-- ================================================================== -->
+    <!-- Section 8: Prayer Slots                                            -->
+    <!-- ================================================================== -->
+    <GridLayout columns="*, auto" class="py-3" (tap)="toggleSection('slots')">
+      <Label col="0" text="Prayer Slots" class="text-sm font-bold text-amber-600 dark:text-amber-400"></Label>
+      <Image *ngIf="isIOS" col="1" [src]="isExpanded('slots') ? 'sys://chevron.up' : 'sys://chevron.down'" tintColor="#fbbf24" width="16" height="16"></Image>
+      <Label *ngIf="!isIOS" col="1" [text]="isExpanded('slots') ? collapseIcon : expandIcon" class="material-icon text-amber-400" style="font-size: 20"></Label>
+    </GridLayout>
+    @if (isExpanded('slots')) {
+      <StackLayout class="pb-3">
+        <Label text="Today's slots" class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1"></Label>
+        <GridLayout columns="*, *, *" class="mb-2">
+          <Label col="0" text="All Done" (tap)="devTools.seedAllSlotsComplete()" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="1" text="Partial" (tap)="devTools.seedPartialSlots()" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+          <Label col="2" text="14d History" (tap)="devTools.seedSlotHistory(14)" class="text-center py-1.5 rounded-md text-xs mx-0.5 bg-amber-500 text-white"></Label>
+        </GridLayout>
+      </StackLayout>
+    }
+
+    <StackLayout class="border-t border-gray-100 dark:border-gray-700"></StackLayout>
+
+    <!-- ================================================================== -->
+    <!-- Section 9: Quote Preview                                           -->
+    <!-- ================================================================== -->
+    <GridLayout columns="*, auto" class="py-3" (tap)="toggleSection('quote')">
+      <Label col="0" text="Quote Preview" class="text-sm font-bold text-amber-600 dark:text-amber-400"></Label>
+      <Image *ngIf="isIOS" col="1" [src]="isExpanded('quote') ? 'sys://chevron.up' : 'sys://chevron.down'" tintColor="#fbbf24" width="16" height="16"></Image>
+      <Label *ngIf="!isIOS" col="1" [text]="isExpanded('quote') ? collapseIcon : expandIcon" class="material-icon text-amber-400" style="font-size: 20"></Label>
+    </GridLayout>
+    @if (isExpanded('quote')) {
+      <StackLayout class="pb-3">
+        <GridLayout columns="auto, *, auto" class="mb-2">
+          <Label col="0" text="Day:" class="text-xs text-gray-600 dark:text-gray-300 mr-2" verticalAlignment="center"></Label>
+          <TextField col="1" keyboardType="number" [text]="quoteDay().toString()" (textChange)="onQuoteDayInput($event.value)" class="border border-gray-300 dark:border-gray-600 rounded-lg p-1 text-xs bg-gray-50 dark:bg-[#2c2c2e] text-gray-800 dark:text-gray-200 mr-2"></TextField>
+          <Label col="2" text="Preview" (tap)="previewQuote()" class="text-center py-1.5 px-3 rounded-md text-xs bg-amber-500 text-white" verticalAlignment="center"></Label>
+        </GridLayout>
+        @if (quotePreview()) {
+          <StackLayout class="bg-gray-50 dark:bg-[#2c2c2e] rounded-lg p-3">
+            <Label [text]="quotePreview()!.text" class="text-xs text-gray-700 dark:text-gray-300 mb-1" textWrap="true"></Label>
+            <Label [text]="'— ' + quotePreview()!.source" class="text-xs text-gray-500 dark:text-gray-400 italic"></Label>
+          </StackLayout>
+        }
+      </StackLayout>
+    }
+
+    <StackLayout class="border-t border-gray-100 dark:border-gray-700"></StackLayout>
+
+    <!-- ================================================================== -->
+    <!-- Section 10: Notifications                                          -->
+    <!-- ================================================================== -->
+    <GridLayout columns="*, auto" class="py-3" (tap)="toggleSection('notif')">
+      <Label col="0" text="Notifications" class="text-sm font-bold text-amber-600 dark:text-amber-400"></Label>
+      <Image *ngIf="isIOS" col="1" [src]="isExpanded('notif') ? 'sys://chevron.up' : 'sys://chevron.down'" tintColor="#fbbf24" width="16" height="16"></Image>
+      <Label *ngIf="!isIOS" col="1" [text]="isExpanded('notif') ? collapseIcon : expandIcon" class="material-icon text-amber-400" style="font-size: 20"></Label>
+    </GridLayout>
+    @if (isExpanded('notif')) {
+      <StackLayout class="pb-3">
+        <Label text="Fire Test Notification" (tap)="devTools.fireTestNotification()" class="text-center py-2 rounded-lg text-xs font-medium bg-amber-500 text-white"></Label>
+        <Label text="Sends a notification in ~3 seconds" class="text-xs text-gray-400 dark:text-gray-500 text-center mt-1"></Label>
+      </StackLayout>
+    }
+
+    <StackLayout class="border-t border-gray-100 dark:border-gray-700"></StackLayout>
+
+    <!-- ================================================================== -->
+    <!-- Section 11: Storage Viewer                                         -->
+    <!-- ================================================================== -->
+    <GridLayout columns="*, auto" class="py-3" (tap)="toggleSection('storage')">
+      <Label col="0" text="Raw Storage" class="text-sm font-bold text-amber-600 dark:text-amber-400"></Label>
+      <Image *ngIf="isIOS" col="1" [src]="isExpanded('storage') ? 'sys://chevron.up' : 'sys://chevron.down'" tintColor="#fbbf24" width="16" height="16"></Image>
+      <Label *ngIf="!isIOS" col="1" [text]="isExpanded('storage') ? collapseIcon : expandIcon" class="material-icon text-amber-400" style="font-size: 20"></Label>
+    </GridLayout>
+    @if (isExpanded('storage')) {
+      <StackLayout class="pb-3">
+        @for (entry of storageEntries(); track entry.key) {
+          <GridLayout columns="auto, *" class="py-0.5">
+            <Label col="0" [text]="entry.key + ':'" class="text-xs text-gray-500 dark:text-gray-400 mr-2 font-bold" style="min-width: 120"></Label>
+            <Label col="1" [text]="entry.value" class="text-xs text-gray-700 dark:text-gray-300" textWrap="true"></Label>
+          </GridLayout>
+        }
+        <Label text="Refresh" (tap)="refreshStorage()" class="text-center py-2 rounded-lg text-xs font-medium bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300 mt-2"></Label>
+      </StackLayout>
+    }
+
+  </StackLayout>
+</StackLayout>

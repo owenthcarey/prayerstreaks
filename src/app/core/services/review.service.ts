@@ -61,6 +61,50 @@ export class ReviewService {
     this.first7DayPrompted.set(false);
   }
 
+  // ---- Dev-only methods (never called in production — panel is hidden) ----
+
+  devGetState(): {
+    lastPromptDate: string;
+    promptCount: number;
+    sessionDates: string[];
+    first7DayPrompted: boolean;
+  } {
+    return {
+      lastPromptDate: this.lastPromptDate(),
+      promptCount: this.promptCount(),
+      sessionDates: this.sessionDates(),
+      first7DayPrompted: this.first7DayPrompted(),
+    };
+  }
+
+  devSetState(state: {
+    lastPromptDate?: string;
+    promptCount?: number;
+    sessionDates?: string[];
+    first7DayPrompted?: boolean;
+  }): void {
+    if (state.lastPromptDate !== undefined) {
+      this.lastPromptDate.set(state.lastPromptDate);
+      this.storage.setString(LAST_REVIEW_PROMPT_KEY, state.lastPromptDate);
+    }
+    if (state.promptCount !== undefined) {
+      this.promptCount.set(state.promptCount);
+      this.storage.setJSON(REVIEW_PROMPT_COUNT_KEY, state.promptCount);
+    }
+    if (state.sessionDates !== undefined) {
+      this.sessionDates.set(state.sessionDates);
+      this.storage.setJSON(SESSION_DATES_KEY, state.sessionDates);
+    }
+    if (state.first7DayPrompted !== undefined) {
+      this.first7DayPrompted.set(state.first7DayPrompted);
+      this.storage.setBoolean(FIRST_7DAY_PROMPTED_KEY, state.first7DayPrompted);
+    }
+  }
+
+  devForcePrompt(): void {
+    this.showNativeReviewPrompt();
+  }
+
   private canPrompt(currentStreak: number): boolean {
     if (this.sessionDates().length <= 1) return false;
     if (currentStreak <= 0) return false;

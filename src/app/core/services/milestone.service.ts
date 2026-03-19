@@ -69,6 +69,17 @@ export class MilestoneService {
     this.pendingCelebration.set(null);
   }
 
+  // ---- Dev-only methods (never called in production — panel is hidden) ----
+
+  devSetUnlockedIds(ids: string[]): void {
+    this.unlockedIds.set(ids);
+    this.storage.setJSON(UNLOCKED_KEY, ids);
+  }
+
+  devSyncMilestones(): void {
+    this.syncUnlockedMilestones();
+  }
+
   /**
    * Silently unlock milestones earned before this feature existed.
    * Does NOT trigger a celebration — only checkForNewMilestones() does.

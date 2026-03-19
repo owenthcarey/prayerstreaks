@@ -15,11 +15,12 @@ import {
   SlotStreakRequirement,
   prayerTypeLabel,
 } from '../../core/models/checkin.model';
+import { DevPanelComponent } from './dev-panel.component';
 
 @Component({
   selector: 'ns-settings',
   templateUrl: './settings.component.html',
-  imports: [NativeScriptCommonModule],
+  imports: [NativeScriptCommonModule, DevPanelComponent],
   schemas: [NO_ERRORS_SCHEMA],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -31,6 +32,7 @@ export class SettingsComponent {
   prayerTypeLabel = prayerTypeLabel;
 
   isIOS = isIOS;
+  showDevPanel = typeof __DEV__ !== 'undefined' && __DEV__;
 
   cancelIcon = String.fromCharCode(0xe5c9);
   addIcon = String.fromCharCode(0xe145);
@@ -136,4 +138,3 @@ export class SettingsComponent {
     }
   }
 }
-

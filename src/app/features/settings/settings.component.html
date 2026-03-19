@@ -362,6 +362,11 @@
       </GridLayout>
     </StackLayout>
 
+    <!-- Dev Panel (debug builds only) -->
+    @if (showDevPanel) {
+      <ns-dev-panel></ns-dev-panel>
+    }
+
     <!-- Reset Section -->
     <Button
       text="Reset All Data"

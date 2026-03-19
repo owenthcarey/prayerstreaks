@@ -3,7 +3,18 @@
  * All date strings use ISO 8601 format: YYYY-MM-DD.
  */
 
+let _todayOverride: string | null = null;
+
+export function setTodayOverride(date: string | null): void {
+  _todayOverride = date;
+}
+
+export function getTodayOverride(): string | null {
+  return _todayOverride;
+}
+
 export function getTodayISO(): string {
+  if (_todayOverride) return _todayOverride;
   return formatDateISO(new Date());
 }
 

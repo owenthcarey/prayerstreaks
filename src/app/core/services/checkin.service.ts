@@ -286,6 +286,27 @@ export class CheckInService {
     this.slotStreakRequirement.set('any');
   }
 
+  // ---- Dev-only methods (never called in production — panel is hidden) ----
+
+  devSetCheckIns(checkIns: CheckIn[]): void {
+    this.checkIns.set(checkIns);
+    this.saveCheckIns(checkIns);
+  }
+
+  devSetShieldCount(count: number): void {
+    this.shieldCount.set(count);
+    this.storage.setJSON(SHIELD_COUNT_KEY, count);
+  }
+
+  devSetShieldedDates(dates: string[]): void {
+    this.shieldedDates.set(dates);
+    this.storage.setJSON(SHIELDED_DATES_KEY, dates);
+  }
+
+  devAutoApplyShields(): void {
+    this.autoApplyShields();
+  }
+
   /**
    * On app open, check for gaps between the most recent covered date and
    * yesterday. If the gap can be fully bridged by available shields,
